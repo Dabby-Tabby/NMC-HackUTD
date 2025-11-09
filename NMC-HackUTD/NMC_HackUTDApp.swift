@@ -11,7 +11,7 @@ import SwiftUI
 struct NMC_HackUTDApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            DashboardView()
         }
     }
 }

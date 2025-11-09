@@ -6,44 +6,60 @@
 //
 
 import SwiftUI
+import WatchConnectivity
 
 struct ContentView: View {
+    @StateObject private var health = FakeHealthDataManager()
     @State private var selectedPulse: String? = nil
     
     let pulses = [
-        ("OK", "checkmark.circle"),
+        ("Alex", "person.fill"),
         ("Help", "exclamationmark.triangle"),
         ("Part", "shippingbox"),
         ("Hot", "flame")
     ]
     
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             Text("PulseLink")
                 .font(.headline)
-                .padding(.bottom, 5)
+            
+            // Fake "live" health metrics
+            VStack(spacing: 2) {
+                Text("❤️ \(Int(health.heartRate)) bpm")
+                Text("🩸 \(Int(health.oxygen))% O₂")
+                Text("🔥 \(Int(health.energy)) kcal")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.bottom, 6)
             
             ForEach(pulses, id: \.0) { (name, icon) in
                 Button {
                     withAnimation {
                         selectedPulse = name
                         WKInterfaceDevice.current().play(.success)
+                        // Also push the current fake data immediately on tap
+                        // (in addition to the 5s timer)
+                        health.sendToPhone()
                     }
                 } label: {
                     HStack {
                         Image(systemName: icon)
-                            .foregroundColor(.blue)
                         Text(name)
-                            .fontWeight(.medium)
                         Spacer()
                         if selectedPulse == name {
                             Image(systemName: "waveform.path.ecg")
                                 .foregroundColor(.green)
                         }
                     }
-                    .padding(8)
-                    .background(RoundedRectangle(cornerRadius: 8)
-                        .fill(selectedPulse == name ? Color.green.opacity(0.2) : Color.gray.opacity(0.2)))
+                    .padding(6)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(selectedPulse == name ?
+                                  Color.green.opacity(0.2) :
+                                  Color.gray.opacity(0.2))
+                    )
                 }
             }
             
