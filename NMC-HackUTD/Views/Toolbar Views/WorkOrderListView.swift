@@ -489,6 +489,8 @@ struct NewWorkOrderSheet: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: WorkOrderViewModel
     
+    @EnvironmentObject var session: PhoneSessionManager
+    
     @State private var title: String = ""
     @State private var location: String = ""
     @State private var description: String = ""
@@ -614,16 +616,22 @@ struct NewWorkOrderSheet: View {
         let trimmedLocation = location.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedDescription = description.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedAssignee = assignedTo.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
+        // Derive owner identity from the session (no direct peerID access)
+        let ownerID = session.ownerID
+        let ownerName = session.ownerName.isEmpty ? "Unknown Tech" : session.ownerName
+
         viewModel.createWorkOrder(
             title: trimmedTitle,
             description: trimmedDescription,
             location: trimmedLocation,
             priority: priority,
             assignedTo: trimmedAssignee.isEmpty ? nil : trimmedAssignee,
-            checklistTexts: checklistDraft
+            checklistTexts: checklistDraft,
+            ownerID: ownerID,
+            ownerName: ownerName
         )
-        
+
         dismiss()
     }
     
@@ -655,3 +663,4 @@ struct WorkOrderListView_Previews: PreviewProvider {
         }
     }
 }
+

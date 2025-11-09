@@ -22,6 +22,19 @@ final class PhoneSessionManager: NSObject, ObservableObject {
     @Published var lastPingFrom: String?
     @Published var connectedPeers: [MCPeerID] = []
     @Published var myDisplayName: String = "Unknown"
+    
+    @AppStorage("localOwnerID") private var storedOwnerID: String = UUID().uuidString
+
+    /// ID you should use for things like WorkOrder.ownerID
+    var ownerID: String {
+        storedOwnerID
+    }
+
+    /// Human-readable name to show in the UI
+    var ownerName: String {
+        myDisplayName
+    }
+    
     @Published var isWatchSessionActive: Bool = false
 
     /// Per-peer vitals dictionary

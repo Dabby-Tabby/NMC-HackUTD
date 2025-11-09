@@ -21,22 +21,20 @@ enum WorkOrderPriority: String, Codable, CaseIterable {
     case high
 }
 
-struct WorkOrder: Identifiable, Codable, Hashable {
+struct WorkOrder: Identifiable, Hashable, Codable {
     let id: String
+
+    let ownerID: String
+    var ownerName: String
 
     var title: String
     var description: String
-    
     var status: WorkOrderStatus
     var priority: WorkOrderPriority
-    
-    // Simple human-readable location string e.g. "DC1 – Room A – Rack R12 – U20"
     var location: String
     var assignedTo: String?
-    
     var checklist: [ChecklistItem]
     var notes: [Note]
-    
     var createdAt: Date
     var updatedAt: Date
 }
@@ -59,6 +57,8 @@ struct Note: Identifiable, Codable, Hashable {
 extension WorkOrder {
     static let mock1 = WorkOrder(
         id: "WO-001",
+        ownerID: "demo-owner",
+         ownerName: "Demo User",
         title: "Replace PSU in GPU server",
         description: """
         Engineer notes: Intermittent power failures on node gpu-23.
@@ -96,6 +96,8 @@ extension WorkOrder {
     
     static let mock2 = WorkOrder(
         id: "WO-002",
+        ownerID: "demo-owner",
+         ownerName: "Demo User",
         title: "Install new compute node",
         description: """
         Install new 1U server in Rack R25, U10.
@@ -120,6 +122,8 @@ extension WorkOrder {
     
     static let mock3 = WorkOrder(
         id: "WO-003",
+        ownerID: "demo-owner",
+         ownerName: "Demo User",
         title: "Visual inspection of hot aisle cabling",
         description: """
         Perform quick visual inspection of cabling in Rack R08 hot aisle.
@@ -201,10 +205,12 @@ final class WorkOrderViewModel: ObservableObject {
         location: String,
         priority: WorkOrderPriority,
         assignedTo: String?,
-        checklistTexts: [String] = []
+        checklistTexts: [String] = [],
+        ownerID: String,
+        ownerName: String
     ) {
         let newID = "WO-\(Int(Date().timeIntervalSince1970))"
-        
+
         let checklistItems = checklistTexts.map { text in
             ChecklistItem(
                 id: UUID().uuidString,
@@ -212,9 +218,11 @@ final class WorkOrderViewModel: ObservableObject {
                 isDone: false
             )
         }
-        
+
         let newWorkOrder = WorkOrder(
             id: newID,
+            ownerID: ownerID,
+            ownerName: ownerName,
             title: title,
             description: description,
             status: .new,
@@ -226,7 +234,7 @@ final class WorkOrderViewModel: ObservableObject {
             createdAt: Date(),
             updatedAt: Date()
         )
-        
+
         workOrders.insert(newWorkOrder, at: 0)
     }
     

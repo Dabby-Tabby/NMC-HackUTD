@@ -113,13 +113,19 @@ extension NomiAssistantView {
     // MARK: Input Area
     private var inputArea: some View {
         HStack(spacing: 10) {
-            // Text Field
-            TextField("Type a command or question...", text: $userInput)
-                .font(.system(size: 15, weight: .medium, design: .rounded))
-                .padding()
-                .background(Color("BoxBlue"))
-                .clipShape(Capsule())
-                .foregroundColor(Color("TextWhite").opacity(0.9))
+            HStack {
+                Image(systemName: "brain.head.profile.fill")
+                    .foregroundColor(.white.opacity(0.7))
+                
+                TextField("Type a command or question...", text: $userInput, axis: .vertical)
+                    .textInputAutocapitalization(.sentences)
+                    .foregroundColor(.white.opacity(2))
+                    .lineLimit(1...3)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .glassEffect()
 
             // Mic Button
             Button {
