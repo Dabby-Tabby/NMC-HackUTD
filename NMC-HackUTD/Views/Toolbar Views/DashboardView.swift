@@ -13,6 +13,7 @@
 import SwiftUI
 import Neumorphic
 import MultipeerConnectivity
+import Combine
 
 private let textOpacity: Double = 0.8
 
@@ -36,7 +37,7 @@ struct DashboardView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         // Header
-                        Label("Vitals Command Center", systemImage: "waveform.path.ecg.rectangle")
+                        Label("PulseLink", systemImage: "waveform.path.ecg.rectangle")
                             .font(.system(size: 22, weight: .semibold, design: .rounded))
                             .foregroundColor(Color("TextWhite").opacity(textOpacity))
                             .padding(.top, 10)
@@ -314,12 +315,12 @@ struct AlertButton: View {
         }) {
             ZStack {
                 Circle()
-                    .fill(Color("PingYellow"))
+                    .fill(Color("BabyBlue"))
                     .frame(width: 80, height: 80)
                     .overlay(
                         RadialGradient(
                             gradient: Gradient(colors: [
-                                Color("PingYellow").opacity(isAlerting ? 0.5 : 0.1),
+                                Color("BabyBlue").opacity(isAlerting ? 0.5 : 0.1),
                                 .clear
                             ]),
                             center: .center,
@@ -329,7 +330,7 @@ struct AlertButton: View {
                         .blur(radius: 15)
                     )
                     .shadow(
-                        color: Color("PingYellow").opacity(isAlerting ? 0.5 : 0.2),
+                        color: Color("BabyBlue").opacity(isAlerting ? 0.5 : 0.2),
                         radius: isAlerting ? 20 : 10
                     )
                     .scaleEffect(isAlerting ? 1.15 : 1.0)
@@ -337,7 +338,7 @@ struct AlertButton: View {
                 Image(systemName: "antenna.radiowaves.left.and.right")
                     .font(.system(size: 28, weight: .semibold))
                     .foregroundColor(Color("TextWhite").opacity(0.9))
-                    .shadow(color: Color("PingYellow").opacity(0.6), radius: 6)
+                    .shadow(color: Color("BabyBlue").opacity(0.6), radius: 6)
                     .scaleEffect(isAlerting ? 1.2 : 1.0)
             }
         }
@@ -416,9 +417,25 @@ struct WaveShape: Shape {
     }
 }
 
+@MainActor
+final class MockSessionManager: ObservableObject {
+    @Published var base = PhoneSessionManager()
+
+    init() {
+        base.myDisplayName = "You"
+        let peer = MCPeerID(displayName: "Teammate")
+        base.connectedPeers = [peer]
+        base.peerVitals = [
+            "Teammate": (heart: 74, oxygen: 98, energy: 210),
+            base.myDisplayName: (heart: 72, oxygen: 99, energy: 180)
+        ]
+    }
+}
+
+
 // MARK: - Preview
 #Preview {
     DashboardView()
-        .environmentObject(PhoneSessionManager())
+        .environmentObject(MockSessionManager().base)
         .preferredColorScheme(.dark)
 }
