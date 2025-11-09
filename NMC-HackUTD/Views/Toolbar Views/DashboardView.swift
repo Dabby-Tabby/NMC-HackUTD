@@ -315,12 +315,12 @@ struct AlertButton: View {
         }) {
             ZStack {
                 Circle()
-                    .fill(Color("BabyBlue"))
+                    .fill(Color("BabyPurple"))
                     .frame(width: 80, height: 80)
                     .overlay(
                         RadialGradient(
                             gradient: Gradient(colors: [
-                                Color("BabyBlue").opacity(isAlerting ? 0.5 : 0.1),
+                                Color("BabyPurple").opacity(isAlerting ? 0.5 : 0.1),
                                 .clear
                             ]),
                             center: .center,
@@ -330,7 +330,7 @@ struct AlertButton: View {
                         .blur(radius: 15)
                     )
                     .shadow(
-                        color: Color("BabyBlue").opacity(isAlerting ? 0.5 : 0.2),
+                        color: Color("BabyPurple").opacity(isAlerting ? 0.5 : 0.2),
                         radius: isAlerting ? 20 : 10
                     )
                     .scaleEffect(isAlerting ? 1.15 : 1.0)
@@ -338,7 +338,7 @@ struct AlertButton: View {
                 Image(systemName: "antenna.radiowaves.left.and.right")
                     .font(.system(size: 28, weight: .semibold))
                     .foregroundColor(Color("TextWhite").opacity(0.9))
-                    .shadow(color: Color("BabyBlue").opacity(0.6), radius: 6)
+                    .shadow(color: Color("BabyPurple").opacity(0.6), radius: 6)
                     .scaleEffect(isAlerting ? 1.2 : 1.0)
             }
         }
