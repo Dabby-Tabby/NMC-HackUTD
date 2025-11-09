@@ -11,28 +11,10 @@ import SwiftUI
 private let textOpacityPrimary: Double = 0.95
 private let textOpacitySecondary: Double = 0.65
 
-// MARK: - Color Theme
-
-extension Color {
-    // Background (deep navy / indigo like your screenshot)
-    static let dashboardBackgroundTop    = Color(red: 10/255, green: 15/255, blue: 32/255)
-    static let dashboardBackgroundBottom = Color(red: 3/255,  green: 7/255,  blue: 18/255)
-    
-    // Card
-    static let dashboardCardBackground   = Color(red: 15/255, green: 23/255, blue: 42/255) // slate-ish
-    static let dashboardCardBorder       = Color.white.opacity(0.06)
-    
-    // Text
-    static let dashboardTextPrimary      = Color.white.opacity(0.95)
-    static let dashboardTextSecondary    = Color.white.opacity(0.65)
-    
-    // Accent / chips
-    static let dashboardAccentBlue       = Color(red: 59/255,  green: 130/255, blue: 246/255) // electric blue
-    static let dashboardAccentMutedBlue  = Color.white.opacity(0.06)
-}
 
 // MARK: - List View
 struct WorkOrderListView: View {
+    @EnvironmentObject var session: PhoneSessionManager
     @StateObject private var viewModel = WorkOrderViewModel()
     
     var body: some View {
@@ -56,7 +38,7 @@ struct WorkOrderListView: View {
                             .frame(maxWidth: .infinity, alignment: .center)
                             .overlay(alignment: .trailing) {
                                 Button {
-                                    // TODO: Add create work order action
+                                    
                                 } label: {
                                     Image(systemName: "plus.circle.fill")
                                         .font(.title)
@@ -70,7 +52,7 @@ struct WorkOrderListView: View {
                             }
                         
                         HStack {
-                            Text("You’re online as")
+                            Text("Active Work Orders")
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color("TextWhite").opacity(0.8))
                             Spacer()
@@ -161,7 +143,7 @@ struct WorkOrderRowView: View {
                     
                     Image(systemName: "chevron.right")
                         .font(.caption2)
-                        .foregroundColor(.dashboardTextSecondary.opacity(0.7))
+                        .foregroundColor(Color.white.opacity(0.65).opacity(0.7))
                 }
             }
             .padding(.horizontal, 16)
@@ -217,8 +199,8 @@ struct WorkOrderDetailView: View {
                                 .font(.caption)
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 6)
-                                .background(Color.dashboardAccentMutedBlue)
-                                .foregroundColor(.dashboardTextSecondary)
+                                .background(Color.white.opacity(0.06))
+                                .foregroundColor(Color.white.opacity(textOpacityPrimary))
                                 .clipShape(Capsule())
                             
                             Spacer()
@@ -231,10 +213,10 @@ struct WorkOrderDetailView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Description")
                         .font(.headline)
-                        .foregroundColor(.dashboardTextPrimary)
+                        .foregroundColor(Color.white.opacity(textOpacityPrimary))
                     Text(workOrder.description)
                         .font(.body)
-                        .foregroundColor(.dashboardTextSecondary)
+                        .foregroundColor(Color.white.opacity(textOpacitySecondary))
                 }
                 
                 // Checklist
@@ -242,16 +224,16 @@ struct WorkOrderDetailView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Checklist")
                             .font(.headline)
-                            .foregroundColor(.dashboardTextPrimary)
+                            .foregroundColor(Color.white.opacity(textOpacityPrimary))
                         
                         ForEach(workOrder.checklist) { item in
                             HStack {
                                 Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(item.isDone ? .green : .dashboardTextSecondary)
+                                    .foregroundColor(item.isDone ? .green : Color.white.opacity(textOpacityPrimary))
                                 
                                 Text(item.text)
-                                    .foregroundColor(item.isDone ? .dashboardTextSecondary : .dashboardTextPrimary)
-                                    .strikethrough(item.isDone, color: .dashboardTextSecondary)
+                                    .foregroundColor(item.isDone ? Color.white.opacity(textOpacitySecondary) : Color.white.opacity(textOpacityPrimary))
+                                    .strikethrough(item.isDone, color: Color.white.opacity(textOpacitySecondary))
                                 
                                 Spacer()
                             }
@@ -265,23 +247,23 @@ struct WorkOrderDetailView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Notes")
                             .font(.headline)
-                            .foregroundColor(.dashboardTextPrimary)
+                            .foregroundColor(Color.white.opacity(textOpacityPrimary))
                         
                         ForEach(workOrder.notes.sorted(by: { $0.createdAt < $1.createdAt })) { note in
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(note.author)
                                     .font(.caption)
-                                    .foregroundColor(.dashboardTextSecondary)
+                                    .foregroundColor(Color.white.opacity(textOpacitySecondary))
                                 
                                 Text(note.message)
                                     .font(.body)
-                                    .foregroundColor(.dashboardTextPrimary)
+                                    .foregroundColor(Color.white.opacity(textOpacitySecondary))
                             }
                             .padding(10)
-                            .background(Color.dashboardCardBackground.opacity(0.8))
+                            .background(Color("RoyalBlue").opacity(0.08))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .stroke(Color.dashboardCardBorder, lineWidth: 1)
+                                    .stroke(Color("BabyBlue"), lineWidth: 1)
                             )
                             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
@@ -292,7 +274,7 @@ struct WorkOrderDetailView: View {
         }
         .background(
             LinearGradient(
-                colors: [.dashboardBackgroundTop, .dashboardBackgroundBottom],
+                colors: [Color("BackgroundBlue"), Color("BoxBlue")],
                 startPoint: .top,
                 endPoint: .bottom
             )
