@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+// MARK: - Global UI Constants
+private let textOpacityPrimary: Double = 0.95
+private let textOpacitySecondary: Double = 0.65
+
 // MARK: - Color Theme
 
 extension Color {
@@ -28,23 +32,51 @@ extension Color {
 }
 
 // MARK: - List View
-
 struct WorkOrderListView: View {
     @StateObject private var viewModel = WorkOrderViewModel()
     
     var body: some View {
         NavigationStack {
             ZStack {
-                Color("BackgroundBlue")
-                    .overlay(CrossHatchBackground(lineColor: .white.opacity(0.02), lineWidth: 0.3, spacing: 30))
-                    .ignoresSafeArea()
+                Color("BackgroundBlue").ignoresSafeArea()
+                CrossHatchBackground(
+                    lineColor: .white.opacity(0.02),
+                    lineWidth: 0.3,
+                    spacing: 30
+                )
+                .ignoresSafeArea(.all)
                 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Active Work Orders")
-                            .font(.headline)
-                            .foregroundColor(.dashboardTextSecondary)
-                            .padding(.horizontal)
+                    VStack(spacing: 24) {
+                        Label("Work Orders", systemImage: "waveform.path.ecg.rectangle")
+                            .font(.system(size: 22, weight: .semibold, design: .rounded))
+                            .foregroundColor(Color("TextWhite").opacity(textOpacityPrimary))
+                            .padding(.top, 10)
+                            .shadow(color: Color("TextWhite").opacity(0.4), radius: 3)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .overlay(alignment: .trailing) {
+                                Button {
+                                    // TODO: Add create work order action
+                                } label: {
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.title)
+                                        .foregroundColor(.white)
+                                }
+                                .tint(.primary)
+                                .padding(8)
+                                .glassEffect(in: Circle())
+                                .accessibilityLabel("Add Work Order")
+                                .padding(.trailing)
+                            }
+                        
+                        HStack {
+                            Text("You’re online as")
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .foregroundColor(Color("TextWhite").opacity(0.8))
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom, 10)
                         
                         VStack(spacing: 10) {
                             ForEach(viewModel.activeWorkOrders) { workOrder in
@@ -63,6 +95,7 @@ struct WorkOrderListView: View {
                                         lineWidth: 0.8,
                                         spacing: 10
                                     )
+                                    .allowsHitTesting(false)
                                 )
                             }
                         }
@@ -71,11 +104,7 @@ struct WorkOrderListView: View {
                     .padding(.vertical, 8)
                 }
             }
-
-            .navigationTitle("Work Orders")
-            .toolbarColorScheme(.dark, for: .navigationBar)
         }
-        .tint(.dashboardAccentBlue)
     }
 }
 
@@ -87,10 +116,10 @@ struct WorkOrderRowView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Color.dashboardCardBackground)
+                .fill(Color("BoxBlue"))
                 .overlay(
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .stroke(Color.dashboardCardBorder, lineWidth: 1)
+                        .stroke(Color("BoxBlue"), lineWidth: 1)
                 )
                 .shadow(color: Color.black.opacity(0.45), radius: 20, x: 0, y: 12)
             
@@ -98,7 +127,7 @@ struct WorkOrderRowView: View {
                 HStack {
                     Text(workOrder.title)
                         .font(.system(.headline, design: .rounded))
-                        .foregroundColor(.dashboardTextPrimary)
+                        .foregroundColor(Color("TextWhite").opacity(textOpacityPrimary))
                         .lineLimit(1)
                     
                     Spacer()
@@ -114,20 +143,20 @@ struct WorkOrderRowView: View {
                 
                 Text(workOrder.location)
                     .font(.subheadline)
-                    .foregroundColor(.dashboardTextSecondary)
+                    .foregroundColor(Color("TextWhite").opacity(textOpacitySecondary))
                     .lineLimit(1)
                 
                 HStack(spacing: 8) {
                     Label(workOrder.statusText, systemImage: workOrder.statusIconName)
                         .font(.caption)
-                        .foregroundColor(.dashboardTextSecondary)
+                        .foregroundColor(Color("TextWhite").opacity(textOpacitySecondary))
                     
                     Spacer()
                     
                     if let assignee = workOrder.assignedTo {
                         Text("👷‍♂️ \(assignee)")
                             .font(.caption)
-                            .foregroundColor(.dashboardTextSecondary)
+                            .foregroundColor(Color("TextWhite").opacity(textOpacitySecondary))
                     }
                     
                     Image(systemName: "chevron.right")
@@ -155,10 +184,10 @@ struct WorkOrderDetailView: View {
                 // Header card
                 ZStack {
                     RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .fill(Color.dashboardCardBackground)
+                        .fill(Color("BoxBlue"))
                         .overlay(
                             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                                .stroke(Color.dashboardCardBorder, lineWidth: 1)
+                                .stroke(Color("BoxBlue"), lineWidth: 1)
                         )
                     
                     VStack(alignment: .leading, spacing: 14) {
@@ -166,11 +195,11 @@ struct WorkOrderDetailView: View {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text(workOrder.title)
                                     .font(.system(.title3, design: .rounded).bold())
-                                    .foregroundColor(.dashboardTextPrimary)
+                                    .foregroundColor(Color("TextWhite").opacity(textOpacityPrimary))
                                 
                                 Text(workOrder.location)
                                     .font(.subheadline)
-                                    .foregroundColor(.dashboardTextSecondary)
+                                    .foregroundColor(Color("TextWhite").opacity(textOpacitySecondary))
                             }
                             Spacer()
                         }
