@@ -6,8 +6,37 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2EF68BDA2EC00FE4005448FF /* Watch-NMC-HackUTD Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 2EF68BD02EC00FE3005448FF /* Watch-NMC-HackUTD Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		2EF68BD82EC00FE4005448FF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2EF68BB62EC00ECC005448FF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2EF68BCF2EC00FE3005448FF;
+			remoteInfo = "Watch-NMC-HackUTD Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		2EF68BDE2EC00FE4005448FF /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				2EF68BDA2EC00FE4005448FF /* Watch-NMC-HackUTD Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		2EF68BBE2EC00ECC005448FF /* NMC-HackUTD.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "NMC-HackUTD.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2EF68BD02EC00FE3005448FF /* Watch-NMC-HackUTD Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Watch-NMC-HackUTD Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +45,22 @@
 			path = "NMC-HackUTD";
 			sourceTree = "<group>";
 		};
+		2EF68BD12EC00FE3005448FF /* Watch-NMC-HackUTD Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Watch-NMC-HackUTD Watch App";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		2EF68BBB2EC00ECC005448FF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2EF68BCD2EC00FE3005448FF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				2EF68BC02EC00ECC005448FF /* NMC-HackUTD */,
+				2EF68BD12EC00FE3005448FF /* Watch-NMC-HackUTD Watch App */,
 				2EF68BBF2EC00ECC005448FF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				2EF68BBE2EC00ECC005448FF /* NMC-HackUTD.app */,
+				2EF68BD02EC00FE3005448FF /* Watch-NMC-HackUTD Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -55,10 +98,12 @@
 				2EF68BBA2EC00ECC005448FF /* Sources */,
 				2EF68BBB2EC00ECC005448FF /* Frameworks */,
 				2EF68BBC2EC00ECC005448FF /* Resources */,
+				2EF68BDE2EC00FE4005448FF /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				2EF68BD92EC00FE4005448FF /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				2EF68BC02EC00ECC005448FF /* NMC-HackUTD */,
@@ -68,6 +113,28 @@
 			);
 			productName = "NMC-HackUTD";
 			productReference = 2EF68BBE2EC00ECC005448FF /* NMC-HackUTD.app */;
+			productType = "com.apple.product-type.application";
+		};
+		2EF68BCF2EC00FE3005448FF /* Watch-NMC-HackUTD Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2EF68BDB2EC00FE4005448FF /* Build configuration list for PBXNativeTarget "Watch-NMC-HackUTD Watch App" */;
+			buildPhases = (
+				2EF68BCC2EC00FE3005448FF /* Sources */,
+				2EF68BCD2EC00FE3005448FF /* Frameworks */,
+				2EF68BCE2EC00FE3005448FF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				2EF68BD12EC00FE3005448FF /* Watch-NMC-HackUTD Watch App */,
+			);
+			name = "Watch-NMC-HackUTD Watch App";
+			packageProductDependencies = (
+			);
+			productName = "Watch-NMC-HackUTD Watch App";
+			productReference = 2EF68BD02EC00FE3005448FF /* Watch-NMC-HackUTD Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -81,6 +148,9 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					2EF68BBD2EC00ECC005448FF = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					2EF68BCF2EC00FE3005448FF = {
 						CreatedOnToolsVersion = 26.0.1;
 					};
 				};
@@ -100,12 +170,20 @@
 			projectRoot = "";
 			targets = (
 				2EF68BBD2EC00ECC005448FF /* NMC-HackUTD */,
+				2EF68BCF2EC00FE3005448FF /* Watch-NMC-HackUTD Watch App */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		2EF68BBC2EC00ECC005448FF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2EF68BCE2EC00FE3005448FF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +200,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2EF68BCC2EC00FE3005448FF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2EF68BD92EC00FE4005448FF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2EF68BCF2EC00FE3005448FF /* Watch-NMC-HackUTD Watch App */;
+			targetProxy = 2EF68BD82EC00FE4005448FF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		2EF68BC72EC00ECE005448FF /* Debug */ = {
@@ -310,6 +403,72 @@
 			};
 			name = Release;
 		};
+		2EF68BDC2EC00FE4005448FF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EB2GVA2QCU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Watch-NMC-HackUTD";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "LokmaLovers.NMC-HackUTD";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "LokmaLovers.NMC-HackUTD.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		2EF68BDD2EC00FE4005448FF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EB2GVA2QCU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Watch-NMC-HackUTD";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "LokmaLovers.NMC-HackUTD";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "LokmaLovers.NMC-HackUTD.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -327,6 +486,15 @@
 			buildConfigurations = (
 				2EF68BCA2EC00ECE005448FF /* Debug */,
 				2EF68BCB2EC00ECE005448FF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2EF68BDB2EC00FE4005448FF /* Build configuration list for PBXNativeTarget "Watch-NMC-HackUTD Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2EF68BDC2EC00FE4005448FF /* Debug */,
+				2EF68BDD2EC00FE4005448FF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
