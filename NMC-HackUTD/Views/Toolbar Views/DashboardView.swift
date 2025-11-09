@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  DashboardView.swift
 //  NMC-HackUTD
 //
 //  Created by Nick Watts on 11/8/25.
@@ -7,33 +7,18 @@
 
 import SwiftUI
 import Neumorphic
+import MultipeerConnectivity
 
-// MARK: - Global UI Constants
 private let textOpacity: Double = 0.8
-
-// MARK: - Employee Model
-struct Employee: Identifiable {
-    let id = UUID()
-    let name: String
-    let heartRate: Double
-    let oxygen: Double
-    let energy: Double
-}
 
 // MARK: - Dashboard
 struct DashboardView: View {
-    @StateObject private var session = PhoneSessionManager()
-    @State private var employees = [
-        Employee(name: "Alex W.",   heartRate: 88, oxygen: 97, energy: 130),
-        Employee(name: "Jordan P.", heartRate: 76, oxygen: 95, energy: 120),
-        Employee(name: "Sam K.",    heartRate: 91, oxygen: 98, energy: 145),
-        Employee(name: "Taylor R.", heartRate: 83, oxygen: 96, energy: 110),
-        Employee(name: "Riley M.",  heartRate: 79, oxygen: 99, energy: 155)
-    ]
+    @EnvironmentObject var session: PhoneSessionManager
     
     var body: some View {
         NavigationStack {
             ZStack {
+                // 🔹 Background
                 Color("BackgroundBlue").ignoresSafeArea()
                 CrossHatchBackground(
                     lineColor: .white.opacity(0.02),
@@ -41,29 +26,62 @@ struct DashboardView: View {
                     spacing: 30
                 )
                 .ignoresSafeArea(.all)
-                
+
                 ScrollView {
                     VStack(spacing: 24) {
+                        // Header
                         Label("Vitals Command Center", systemImage: "waveform.path.ecg.rectangle")
                             .font(.system(size: 22, weight: .semibold, design: .rounded))
                             .foregroundColor(Color("TextWhite").opacity(textOpacity))
                             .padding(.top, 10)
                             .shadow(color: Color("TextWhite").opacity(0.4), radius: 3)
                         
-                        VStack(spacing: 20) {
-                            ForEach(employees) { emp in
-                                EmployeeCard(employee: emp) {
-                                    print("ALERT sent to \(emp.name)")
-                                    let generator = UINotificationFeedbackGenerator()
-                                    generator.notificationOccurred(.error)
-                                }
-                            }
+                        // Current user banner
+                        HStack {
+                            Image(systemName: "person.crop.circle.fill.badge.checkmark")
+                                .font(.system(size: 20))
+                                .foregroundColor(Color("BabyBlue"))
+                            Text("You’re online as \(session.myDisplayName)")
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .foregroundColor(Color("TextWhite").opacity(0.8))
+                            Spacer()
                         }
                         .padding(.horizontal)
+                        .padding(.bottom, 10)
+
+                        // 🔹 Connected peers
+                        if session.connectedPeers.isEmpty {
+                            VStack(spacing: 10) {
+                                Image(systemName: "person.2.slash")
+                                    .font(.system(size: 40))
+                                    .foregroundColor(Color("TextWhite").opacity(0.4))
+                                Text("No team members online")
+                                    .foregroundColor(Color("TextWhite").opacity(0.6))
+                                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                            }
+                            .padding(.top, 40)
+                        } else {
+                            VStack(spacing: 20) {
+                                ForEach(session.connectedPeers, id: \.self) { peer in
+                                    EmployeeCard(
+                                        employee: Employee(
+                                            name: peer.displayName,
+                                            heartRate: session.heartRate,
+                                            oxygen: session.oxygen,
+                                            energy: session.energy
+                                        )
+                                    ) {
+                                        session.sendPing(to: peer)
+                                    }
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
                     }
                     .padding(.bottom)
                 }
-                
+
+                // 🔹 Incoming ping banner
                 if let from = session.lastPingFrom {
                     VStack {
                         HStack {
@@ -79,7 +97,14 @@ struct DashboardView: View {
                                     .foregroundColor(Color("TextWhite").opacity(textOpacity * 0.9))
                             }
                             Spacer()
-                            Button(action: { session.lastPingFrom = nil }) {
+                            Button(action: {
+                                // ✅ Prevent modifying state during render
+                                DispatchQueue.main.async {
+                                    withAnimation(.spring()) {
+                                        session.lastPingFrom = nil
+                                    }
+                                }
+                            }) {
                                 Image(systemName: "xmark.circle.fill")
                                     .font(.title2)
                                     .foregroundColor(Color("TextWhite").opacity(textOpacity))
@@ -97,10 +122,11 @@ struct DashboardView: View {
                     .animation(.spring(), value: session.lastPingFrom)
                 }
             }
+            // 🔹 Toolbar Navigation
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
                     HStack(spacing: 16) {
-                        NavigationLink(destination: DashboardView()) {
+                        NavigationLink(destination: DashboardView().environmentObject(session)) {
                             Image(systemName: "heart.text.clipboard.fill")
                         }
                         .padding(.leading, 12)
@@ -109,7 +135,7 @@ struct DashboardView: View {
                             .frame(height: 20)
                             .background(Color.white.opacity(0.3))
 
-                        NavigationLink(destination: WorkOrderListView()) {
+                        NavigationLink(destination: WorkOrderListView().environmentObject(session)) {
                             Image(systemName: "list.clipboard.fill")
                         }
 
@@ -117,7 +143,7 @@ struct DashboardView: View {
                             .frame(height: 20)
                             .background(Color.white.opacity(0.3))
 
-                        NavigationLink(destination: BuddyView()) {
+                        NavigationLink(destination: BuddyView().environmentObject(session)) {
                             Image(systemName: "cpu.fill")
                         }
                         .padding(.trailing, 12)
@@ -130,6 +156,14 @@ struct DashboardView: View {
     }
 }
 
+// MARK: - Employee Model
+struct Employee: Identifiable {
+    let id = UUID()
+    let name: String
+    let heartRate: Double
+    let oxygen: Double
+    let energy: Double
+}
 
 // MARK: - Employee Card
 struct EmployeeCard: View {
@@ -150,7 +184,7 @@ struct EmployeeCard: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                 )
                 .overlay(
-                    WaveOverlay()
+                    WaveOverlay() // ✅ fixed version below
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                 )
                 .overlay(
@@ -212,20 +246,6 @@ struct EmployeeCard: View {
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
-            
-            Circle()
-                .fill(Color("IncreaseGreen"))
-                .frame(width: 10, height: 10)
-                .shadow(color: Color("IncreaseGreen").opacity(0.8), radius: 10, x: 0, y: 0)
-                .shadow(color: Color("TextWhite").opacity(0.2), radius: 3, x: 0, y: 0)
-                .overlay(
-                    Circle()
-                        .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
-                )
-                .padding(15)
-                .opacity(0.95)
-                .scaleEffect(1.0 + 0.05 * sin(Date().timeIntervalSinceReferenceDate * 3))
-                .animation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true), value: UUID())
         }
     }
 }
@@ -293,7 +313,7 @@ struct AlertButton: View {
     }
 }
 
-// MARK: - Wave Overlay
+// MARK: - Wave Overlay (Fixed)
 struct WaveOverlay: View {
     var color1: Color = Color("TextWhite")
     var color2: Color = Color("RoyalBlue")
@@ -306,26 +326,40 @@ struct WaveOverlay: View {
     
     var body: some View {
         TimelineView(.animation) { timeline in
-            let _ = phaseUpdater(date: timeline.date)
+            let elapsed = timeline.date.timeIntervalSinceReferenceDate
+            // compute current phase without mutating any SwiftUI state
+            let currentPhase = CGFloat(elapsed * speed)
             
             ZStack {
-                WaveShape(amplitude: amplitude, frequency: frequency, phase: phase)
-                    .stroke(color1.opacity(opacity), lineWidth: 2)
-                    .shadow(color: color1.opacity(0.2), radius: 4)
+                AnimatedWave(amplitude: amplitude,
+                             frequency: frequency,
+                             phase: currentPhase,
+                             color: color1.opacity(opacity))
                 
-                WaveShape(amplitude: amplitude * 1.3, frequency: frequency * 0.8, phase: phase + .pi)
-                    .stroke(color2.opacity(opacity), lineWidth: 2)
-                    .shadow(color: color2.opacity(0.2), radius: 4)
+                AnimatedWave(amplitude: amplitude * 1.3,
+                             frequency: frequency * 0.8,
+                             phase: currentPhase + .pi,
+                             color: color2.opacity(opacity))
             }
         }
         .drawingGroup()
     }
+}
+
+struct AnimatedWave: View {
+    var amplitude: CGFloat
+    var frequency: CGFloat
+    var phase: CGFloat
+    var color: Color
     
-    private func phaseUpdater(date: Date) -> Bool {
-        phase = CGFloat(date.timeIntervalSinceReferenceDate * speed)
-        return true
+    var body: some View {
+        WaveShape(amplitude: amplitude, frequency: frequency, phase: phase)
+            .stroke(color, lineWidth: 2)
+            .shadow(color: color.opacity(0.2), radius: 4)
+            .animation(nil, value: phase) // ✅ disables implicit re-animation
     }
 }
+
 
 // MARK: - Wave Shape
 struct WaveShape: Shape {
@@ -353,5 +387,6 @@ struct WaveShape: Shape {
 // MARK: - Preview
 #Preview {
     DashboardView()
+        .environmentObject(PhoneSessionManager())
         .preferredColorScheme(.dark)
 }

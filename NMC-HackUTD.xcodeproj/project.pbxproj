@@ -40,9 +40,22 @@
 		2EF68BD02EC00FE3005448FF /* Watch-NMC-HackUTD Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Watch-NMC-HackUTD Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2E3393D32EC04C1C00D7E95D /* Exceptions for "NMC-HackUTD" folder in "NMC-HackUTD" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 2EF68BBD2EC00ECC005448FF /* NMC-HackUTD */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2EF68BC02EC00ECC005448FF /* NMC-HackUTD */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2E3393D32EC04C1C00D7E95D /* Exceptions for "NMC-HackUTD" folder in "NMC-HackUTD" target */,
+			);
 			path = "NMC-HackUTD";
 			sourceTree = "<group>";
 		};
@@ -358,8 +371,10 @@
 				DEVELOPMENT_TEAM = EB2GVA2QCU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "NMC-HackUTD/Info.plist";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app would like to request health access.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app would like to request health records.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "PulseLink uses the local network to discover and connect to nearby team devices for live communication.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app would like to request microphone access.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -394,8 +409,10 @@
 				DEVELOPMENT_TEAM = EB2GVA2QCU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "NMC-HackUTD/Info.plist";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app would like to request health access.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app would like to request health records.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "PulseLink uses the local network to discover and connect to nearby team devices for live communication.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app would like to request microphone access.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

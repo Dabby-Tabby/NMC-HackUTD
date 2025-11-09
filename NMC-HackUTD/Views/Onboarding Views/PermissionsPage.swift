@@ -13,7 +13,7 @@ struct PermissionsPage: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var showingHealthPrompt = false
     @State private var showingMicPrompt = false
-    @State private var navigateToDashboard = false
+    @State private var navigateToNameSetup = false
     private let healthStore = HKHealthStore()
 
     var body: some View {
@@ -82,10 +82,12 @@ struct PermissionsPage: View {
                         .padding(.horizontal, 30)
                     }
 
-                    // 🔹 Hidden Navigation Trigger
-                    NavigationLink(destination: DashboardView()
-                        .navigationBarBackButtonHidden(true),
-                                   isActive: $navigateToDashboard) {
+                    // 🔹 Hidden Navigation Trigger → NameSetupView
+                    NavigationLink(
+                        destination: NameSetupView()
+                            .navigationBarBackButtonHidden(true),
+                        isActive: $navigateToNameSetup
+                    ) {
                         EmptyView()
                     }
 
@@ -143,7 +145,7 @@ struct PermissionsPage: View {
     private func checkCompletion() {
         if showingHealthPrompt && showingMicPrompt {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                navigateToDashboard = true
+                navigateToNameSetup = true
             }
         }
     }
@@ -160,7 +162,7 @@ struct PermissionCardView: View {
 
     var body: some View {
         ZStack {
-            // Card background with fixed corner clipping
+            // Card background
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .fill(Color("BoxBlue"))
                 .overlay(
@@ -187,11 +189,13 @@ struct PermissionCardView: View {
             HStack(spacing: 16) {
                 ZStack {
                     Circle()
-                        .fill(LinearGradient(
-                            colors: gradientColors,
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ))
+                        .fill(
+                            LinearGradient(
+                                colors: gradientColors,
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
                         .frame(width: 52, height: 52)
                         .shadow(color: gradientColors[0].opacity(0.4), radius: 8, x: 0, y: 4)
 
