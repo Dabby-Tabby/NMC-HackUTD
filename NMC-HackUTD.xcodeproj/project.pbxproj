@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2E3DAEC42EC01AEA004BF7C0 /* Neumorphic in Frameworks */ = {isa = PBXBuildFile; productRef = 2E3DAEC32EC01AEA004BF7C0 /* Neumorphic */; };
 		2EF68BDA2EC00FE4005448FF /* Watch-NMC-HackUTD Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 2EF68BD02EC00FE3005448FF /* Watch-NMC-HackUTD Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -57,6 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2E3DAEC42EC01AEA004BF7C0 /* Neumorphic in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -110,6 +112,7 @@
 			);
 			name = "NMC-HackUTD";
 			packageProductDependencies = (
+				2E3DAEC32EC01AEA004BF7C0 /* Neumorphic */,
 			);
 			productName = "NMC-HackUTD";
 			productReference = 2EF68BBE2EC00ECC005448FF /* NMC-HackUTD.app */;
@@ -145,7 +148,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2600;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					2EF68BBD2EC00ECC005448FF = {
 						CreatedOnToolsVersion = 26.0.1;
@@ -164,6 +167,9 @@
 			);
 			mainGroup = 2EF68BB52EC00ECC005448FF;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				2E3DAEC22EC01AEA004BF7C0 /* XCRemoteSwiftPackageReference "neumorphic" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2EF68BBF2EC00ECC005448FF /* Products */;
 			projectDirPath = "";
@@ -277,6 +283,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -334,6 +341,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -500,6 +508,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2E3DAEC22EC01AEA004BF7C0 /* XCRemoteSwiftPackageReference "neumorphic" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/costachung/neumorphic/";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2E3DAEC32EC01AEA004BF7C0 /* Neumorphic */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2E3DAEC22EC01AEA004BF7C0 /* XCRemoteSwiftPackageReference "neumorphic" */;
+			productName = Neumorphic;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2EF68BB62EC00ECC005448FF /* Project object */;
 }
