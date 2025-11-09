@@ -71,4 +71,27 @@ class FakeHealthDataManager: NSObject, ObservableObject, WCSessionDelegate {
             print("WCSession activation error: \(error.localizedDescription)")
         }
     }
+    
+    // In FakeHealthDataManager.swift (watch target)
+    func sendPing(to peerName: String, senderName: String) {
+        guard let session = session else {
+            print("⌚ No WCSession set up")
+            return
+        }
+        guard session.isReachable else {
+            print("⌚ iPhone not reachable right now")
+            return
+        }
+
+        let payload: [String: Any] = [
+            "type": "ping",
+            "to": peerName,       // optional target field if you support multi-peer/team
+            "from": senderName,
+            "timestamp": Date().timeIntervalSince1970
+        ]
+        session.sendMessage(payload, replyHandler: nil) { error in
+            print("⌚ send ping failed: \(error.localizedDescription)")
+        }
+    }
+
 }

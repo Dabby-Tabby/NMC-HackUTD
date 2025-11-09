@@ -1,80 +1,55 @@
-//
-//  ContentView.swift
-//  Watch-NMC-HackUTD Watch App
-//
-//  Created by Nick Watts on 11/8/25.
-//
-
+// ContentView.swift (watch target)
 import SwiftUI
 import WatchConnectivity
 
 struct ContentView: View {
     @StateObject private var health = FakeHealthDataManager()
-    @State private var selectedPulse: String? = nil
+    @State private var selectedPerson: String? = nil
     
-    let pulses = [
-        ("Alex", "person.fill"),
-        ("Help", "exclamationmark.triangle"),
-        ("Part", "shippingbox"),
-        ("Hot", "flame")
-    ]
+    // demo contact list — you could replace with discovered peers
+    let people = ["Alex", "Jordan", "Sam", "Taylor"]
+    let me = "Nick" // set sender name dynamically if needed
     
     var body: some View {
         VStack(spacing: 8) {
-            Text("PulseLink")
-                .font(.headline)
+            Text("PulseLink").font(.headline)
             
-            // Fake "live" health metrics
-            VStack(spacing: 2) {
-                Text("❤️ \(Int(health.heartRate)) bpm")
-                Text("🩸 \(Int(health.oxygen))% O₂")
-                Text("🔥 \(Int(health.energy)) kcal")
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
-            }
-            .padding(.bottom, 6)
-            
-            ForEach(pulses, id: \.0) { (name, icon) in
-                Button {
-                    withAnimation {
-                        selectedPulse = name
-                        WKInterfaceDevice.current().play(.success)
-                        // Also push the current fake data immediately on tap
-                        // (in addition to the 5s timer)
-                        health.sendToPhone()
-                    }
-                } label: {
+            List {
+                ForEach(people, id: \.self) { person in
                     HStack {
-                        Image(systemName: icon)
-                        Text(name)
+                        Text(person)
                         Spacer()
-                        if selectedPulse == name {
-                            Image(systemName: "waveform.path.ecg")
+                        if selectedPerson == person {
+                            Image(systemName: "checkmark")
                                 .foregroundColor(.green)
                         }
                     }
-                    .padding(6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(selectedPulse == name ?
-                                  Color.green.opacity(0.2) :
-                                  Color.gray.opacity(0.2))
-                    )
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        selectedPerson = person
+                    }
                 }
             }
+            .frame(height: 120)
+            
+            HStack {
+                Button("Ping") {
+                    guard let target = selectedPerson else { return }
+                    health.sendPing(to: target, senderName: me)
+                    // local feedback to confirm send
+                    WKInterfaceDevice.current().play(.directionUp)
+                }
+                .buttonStyle(.borderedProminent)
+                
+                Button("Cancel") {
+                    selectedPerson = nil
+                }
+                .buttonStyle(.bordered)
+            }
+            .padding(.top, 6)
             
             Spacer()
-            
-            Button("Emergency SOS") {
-                WKInterfaceDevice.current().play(.failure)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.red)
         }
         .padding()
     }
-}
-
-#Preview {
-    ContentView()
 }
