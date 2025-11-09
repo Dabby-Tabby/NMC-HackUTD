@@ -77,7 +77,7 @@ struct LaunchView: View {
                         .padding(.bottom, 16)
                         
                         VStack(spacing: 6) {
-                            Text("PulseLink Control Center")
+                            Text("PulseLink")
                                 .font(.system(size: 26, weight: .bold, design: .rounded))
                                 .foregroundColor(Color("TextWhite"))
                             
@@ -91,7 +91,7 @@ struct LaunchView: View {
                     }
                     
                     // 🔹 Get Started Button
-                    NavigationLink(destination: DashboardView()) {
+                    NavigationLink(destination: PermissionsPage()) {
                         Text("Enter Control Center")
                             .font(.headline.bold())
                             .foregroundColor(Color("TextWhite"))
