@@ -413,7 +413,7 @@ struct WorkOrderDetailView: View {
         ZStack {
             HStack(spacing: 10) {
                 HStack {
-                    Image(systemName: "text.bubble.fill")
+                    Image(systemName: "long.text.page.and.pencil.fill")
                         .foregroundColor(.white.opacity(0.7))
                     
                     TextField("Add a note...", text: $newNoteText, axis: .vertical)

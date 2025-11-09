@@ -23,7 +23,7 @@ enum WorkOrderPriority: String, Codable, CaseIterable {
 
 struct WorkOrder: Identifiable, Codable, Hashable {
     let id: String
-    
+
     var title: String
     var description: String
     
