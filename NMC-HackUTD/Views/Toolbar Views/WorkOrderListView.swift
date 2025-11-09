@@ -31,7 +31,7 @@ struct WorkOrderListView: View {
                 
                 ScrollView {
                     VStack(spacing: 24) {
-                        Label("Work Orders", systemImage: "waveform.path.ecg.rectangle")
+                        Label("Work Orders", systemImage: "paperclip")
                             .font(.system(size: 22, weight: .semibold, design: .rounded))
                             .foregroundColor(Color("TextWhite").opacity(textOpacityPrimary))
                             .padding(.top, 10)
