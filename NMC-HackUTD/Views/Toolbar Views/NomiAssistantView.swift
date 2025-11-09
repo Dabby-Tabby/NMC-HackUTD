@@ -37,6 +37,7 @@ struct NomiAssistantView: View {
                 mainContent
             }
             .navigationBarBackButtonHidden(true)
+            .hideKeyboardOnTap()
         }
     }
 }
@@ -209,4 +210,16 @@ extension NomiAssistantView {
     NomiAssistantView(session: PhoneSessionManager())
         .environmentObject(PhoneSessionManager())
         .preferredColorScheme(.dark)
+}
+
+// MARK: - Dismiss Keyboard Helper
+extension View {
+    func hideKeyboardOnTap() -> some View {
+        self.onTapGesture {
+            UIApplication.shared.sendAction(
+                #selector(UIResponder.resignFirstResponder),
+                to: nil, from: nil, for: nil
+            )
+        }
+    }
 }

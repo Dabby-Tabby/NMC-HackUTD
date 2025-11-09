@@ -32,14 +32,14 @@ final class NomiAssistantViewModel: ObservableObject {
     private func showInitialGreeting() {
         let activeOrders = workOrderViewModel.activeWorkOrders
 
-        var greeting = "Hello \(userName), my name is Nomi — your intelligent operations assistant here to help you manage and streamline your data center tasks."
+        var greeting = "Hello \(userName), my name is Nomi — your AI assistant for NMC² operations. I’m here to help you communicate hands-free and handle tasks around the data center.\n\n"
 
         if activeOrders.isEmpty {
-            greeting += " You currently don’t have any active work orders, but I can help you review past tasks, create new ones, or assist with technical procedures whenever you’re ready."
+            greeting += "You currently don’t have any active work orders, but I can help you review past tasks, create new ones, or assist with technical procedures whenever you’re ready."
         } else {
             let count = activeOrders.count
-            let taskWord = count == 1 ? "work order" : "work orders"
-            greeting += " I see that you have \(count) active \(taskWord) assigned. I can help you review progress, check off checklist items, or log notes on your tasks — just ask me what you'd like to do."
+            let taskWord = count == 1 ? "open task" : "open tasks"
+            greeting += "I see that you have \(count) \(taskWord) across your work orders. I can help you review progress, check off checklist items, or log notes on your tasks — just ask me what you'd like to do."
         }
 
         messages.append(ChatMessage(sender: .nomi, text: greeting))
@@ -135,9 +135,12 @@ final class NomiAssistantViewModel: ObservableObject {
         isSpeaking = false
     }
 
-    // MARK: - Gemini API
     private func requestGeminiResponse(for text: String) async throws -> String {
-        return try await sendToGemini(text)
+        return try await sendToGemini(
+            text,
+            userName: userName,
+            workOrders: workOrderViewModel.activeWorkOrders
+        )
     }
 
     // MARK: - Silence Detection
