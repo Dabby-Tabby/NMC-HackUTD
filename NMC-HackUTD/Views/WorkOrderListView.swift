@@ -36,6 +36,7 @@ struct WorkOrderListView: View {
         NavigationStack {
             ZStack {
                 Color("BackgroundBlue")
+                    .overlay(CrossHatchBackground(lineColor: .white.opacity(0.02), lineWidth: 0.3, spacing: 30))
                     .ignoresSafeArea()
                 
                 ScrollView {
@@ -55,7 +56,14 @@ struct WorkOrderListView: View {
                                 } label: {
                                     WorkOrderRowView(workOrder: workOrder)
                                 }
-                                .buttonStyle(.plain) // keep card look, no row highlight
+                                .buttonStyle(.plain)
+                                .overlay(
+                                    CrossHatchBackground(
+                                        lineColor: .white.opacity(0.01),
+                                        lineWidth: 0.8,
+                                        spacing: 10
+                                    )
+                                )
                             }
                         }
                         .padding(.horizontal)
@@ -63,6 +71,7 @@ struct WorkOrderListView: View {
                     .padding(.vertical, 8)
                 }
             }
+
             .navigationTitle("Work Orders")
             .toolbarColorScheme(.dark, for: .navigationBar)
         }
