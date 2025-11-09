@@ -16,6 +16,7 @@ private let textOpacitySecondary: Double = 0.65
 struct WorkOrderListView: View {
     @EnvironmentObject var session: PhoneSessionManager
     @StateObject private var viewModel = WorkOrderViewModel()
+    @State private var isPresentingNewWorkOrder = false
     
     var body: some View {
         NavigationStack {
@@ -38,7 +39,7 @@ struct WorkOrderListView: View {
                             .frame(maxWidth: .infinity, alignment: .center)
                             .overlay(alignment: .trailing) {
                                 Button {
-                                    
+                                    isPresentingNewWorkOrder = true
                                 } label: {
                                     Image(systemName: "plus.circle.fill")
                                         .font(.title)
@@ -86,6 +87,9 @@ struct WorkOrderListView: View {
                     .padding(.vertical, 8)
                 }
             }
+        }
+        .sheet(isPresented: $isPresentingNewWorkOrder) {
+            NewWorkOrderSheet(viewModel: viewModel)
         }
     }
 }
@@ -158,6 +162,10 @@ struct WorkOrderRowView: View {
 struct WorkOrderDetailView: View {
     let workOrder: WorkOrder
     @ObservedObject var viewModel: WorkOrderViewModel
+    @EnvironmentObject var session: PhoneSessionManager
+    
+    @State private var newTaskText: String = ""
+    @State private var newNoteText: String = ""
     
     var body: some View {
         ScrollView {
@@ -204,6 +212,15 @@ struct WorkOrderDetailView: View {
                                 .clipShape(Capsule())
                             
                             Spacer()
+                            
+                            let assingedToText: String = workOrder.assignedTo ?? "Unassigned"
+                            Text("👷‍♂️\(assingedToText)")
+                                .font(.caption)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(Color.white.opacity(0.06))
+                                .foregroundColor(Color.white.opacity(textOpacityPrimary))
+                                .clipShape(Capsule())
                         }
                     }
                     .padding(18)
@@ -220,57 +237,122 @@ struct WorkOrderDetailView: View {
                 }
                 
                 // Checklist
-                if !workOrder.checklist.isEmpty {
+                if let updatedWorkOrder = viewModel.workOrders.first(where: { $0.id == workOrder.id }) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Checklist")
                             .font(.headline)
                             .foregroundColor(Color.white.opacity(textOpacityPrimary))
                         
-                        ForEach(workOrder.checklist) { item in
-                            HStack {
-                                Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(item.isDone ? .green : Color.white.opacity(textOpacityPrimary))
+                        if updatedWorkOrder.checklist.isEmpty {
+                            // Placeholder/template view when there are no tasks
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("No tasks added yet.")
+                                    .font(.subheadline)
+                                    .foregroundColor(Color.white.opacity(0.5))
                                 
-                                Text(item.text)
-                                    .foregroundColor(item.isDone ? Color.white.opacity(textOpacitySecondary) : Color.white.opacity(textOpacityPrimary))
-                                    .strikethrough(item.isDone, color: Color.white.opacity(textOpacitySecondary))
+                                Text("Suggested steps:")
+                                    .font(.caption)
+                                    .foregroundColor(Color.white.opacity(0.4))
                                 
-                                Spacer()
+                                Text("• Verify server is safe to work on")
+                                    .font(.caption)
+                                    .foregroundColor(Color.white.opacity(0.35))
+                                
+                                Text("• Document part removal / replacement")
+                                    .font(.caption)
+                                    .foregroundColor(Color.white.opacity(0.35))
+                                
+                                Text("• Run post-maintenance checks")
+                                    .font(.caption)
+                                    .foregroundColor(Color.white.opacity(0.35))
                             }
                             .padding(.vertical, 4)
+                        } else {
+                            ForEach(updatedWorkOrder.checklist) { item in
+                                Button {
+                                    viewModel.toggleChecklistItem(workOrderID: workOrder.id, itemID: item.id)
+                                } label: {
+                                    HStack {
+                                        Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
+                                            .foregroundColor(item.isDone ? .green : Color.white.opacity(textOpacityPrimary))
+                                        
+                                        Text(item.text)
+                                            .foregroundColor(
+                                                item.isDone
+                                                ? Color.white.opacity(textOpacitySecondary)
+                                                : Color.white.opacity(textOpacityPrimary)
+                                            )
+                                            .strikethrough(item.isDone, color: Color.white.opacity(textOpacitySecondary))
+                                        
+                                        Spacer()
+                                    }
+                                    .padding(.vertical, 4)
+                                    .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
+                        
+                        // New Task input
+                        HStack {
+                            TextField("New task...", text: $newTaskText)
+                                .foregroundColor(.white)
+                                .textInputAutocapitalization(.sentences)
+                                .submitLabel(.done)
+                                .onSubmit(addNewTask)
+                            
+                            Button {
+                                addNewTask()
+                            } label: {
+                                Label("Add", systemImage: "plus.circle.fill")
+                                    .labelStyle(.iconOnly)
+                                    .imageScale(.large)
+                            }
+                            .disabled(newTaskText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        }
+                        .padding(.top, 4)
                     }
                 }
                 
                 // Notes
-                if !workOrder.notes.isEmpty {
+                if let updatedWorkOrder = viewModel.workOrders.first(where: { $0.id == workOrder.id }) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Notes")
                             .font(.headline)
                             .foregroundColor(Color.white.opacity(textOpacityPrimary))
                         
-                        ForEach(workOrder.notes.sorted(by: { $0.createdAt < $1.createdAt })) { note in
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(note.author)
-                                    .font(.caption)
-                                    .foregroundColor(Color.white.opacity(textOpacitySecondary))
-                                
-                                Text(note.message)
-                                    .font(.body)
-                                    .foregroundColor(Color.white.opacity(textOpacitySecondary))
+                        if updatedWorkOrder.notes.isEmpty {
+                            Text("No notes yet. Be the first to leave an update.")
+                                .font(.subheadline)
+                                .foregroundColor(Color.white.opacity(textOpacitySecondary))
+                                .padding(.vertical, 4)
+                        } else {
+                            ForEach(
+                                updatedWorkOrder.notes.sorted(by: { $0.createdAt < $1.createdAt })
+                            ) { note in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(note.author)
+                                        .font(.caption)
+                                        .foregroundColor(Color.white.opacity(textOpacitySecondary))
+                                    
+                                    Text(note.message)
+                                        .font(.body)
+                                        .foregroundColor(Color.white.opacity(textOpacityPrimary))
+                                }
+                                .padding(10)
+                                .background(Color("RoyalBlue").opacity(0.08))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .stroke(Color("BabyBlue"), lineWidth: 1)
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                             }
-                            .padding(10)
-                            .background(Color("RoyalBlue").opacity(0.08))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .stroke(Color("BabyBlue"), lineWidth: 1)
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
                     }
                 }
             }
             .padding()
+            .padding(.bottom, 80)
         }
         .background(
             LinearGradient(
@@ -282,10 +364,78 @@ struct WorkOrderDetailView: View {
         )
         .navigationTitle("Work Order")
         .navigationBarTitleDisplayMode(.inline)
+        .safeAreaInset(edge: .bottom) {
+            noteInputBar
+        }
+    }
+    
+    
+    private func addNewTask() {
+        let trimmed = newTaskText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        viewModel.addChecklistItem(to: workOrder.id, text: trimmed)
+        newTaskText = ""
+    }
+    
+    private func submitNote() {
+        let trimmed = newNoteText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        
+        // Use session name if available, else a fallback
+        let authorName = session.myDisplayName.isEmpty ? "You" : session.myDisplayName
+        
+        viewModel.addNote(
+            to: workOrder.id,
+            author: authorName,
+            message: trimmed
+        )
+        
+        newNoteText = ""
+    }
+    
+    // MARK: - Note Input Bar
+
+    private var noteInputBar: some View {
+        ZStack {
+            HStack(spacing: 10) {
+                HStack {
+                    Image(systemName: "text.bubble.fill")
+                        .foregroundColor(.white.opacity(0.7))
+                    
+                    TextField("Add a note...", text: $newNoteText, axis: .vertical)
+                        .textInputAutocapitalization(.sentences)
+                        .foregroundColor(.white)
+                        .lineLimit(1...3)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
+                )
+                .glassEffect()
+                
+                Button {
+                    submitNote()
+                } label: {
+                    Image(systemName: "paperplane.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(newNoteText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                         ? .white.opacity(0.3)
+                                         : Color("BabyBlue"))
+                }
+                .disabled(newNoteText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+            .padding(.horizontal)
+            .padding(.top, 8)
+            .padding(.bottom, 12)
+        }
     }
 }
 
 // MARK: - Helpers
+
 
 private extension WorkOrder {
     var priorityText: String {
@@ -322,6 +472,160 @@ private extension WorkOrder {
         }
     }
 }
+
+// MARK: - New Work Order Sheet
+
+struct NewWorkOrderSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject var viewModel: WorkOrderViewModel
+    
+    @State private var title: String = ""
+    @State private var location: String = ""
+    @State private var description: String = ""
+    @State private var assignedTo: String = ""
+    @State private var priority: WorkOrderPriority = .medium
+    
+    @State private var checklistDraft: [String] = []
+    @State private var newChecklistText: String = ""
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Details") {
+                    TextField("Title", text: $title)
+                    TextField("Location", text: $location)
+                    TextField("Assigned to (optional)", text: $assignedTo)
+                }
+                
+                Section("Priority") {
+                    Picker("Priority", selection: $priority) {
+                        ForEach(WorkOrderPriority.allCases, id: \.self) { level in
+                            Text(label(for: level))
+                                .tag(level)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+                
+                Section("Description") {
+                    TextEditor(text: $description)
+                        .frame(minHeight: 120)
+                }
+                
+                Section("Checklist") {
+                    if checklistDraft.isEmpty {
+                        // Placeholder/template when user hasn't added any items
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("No tasks yet.")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Text("Example:")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text("• Verify server is powered down safely")
+                                .font(.caption)
+                                .foregroundColor(.secondary.opacity(0.8))
+                            Text("• Remove and label faulty component")
+                                .font(.caption)
+                                .foregroundColor(.secondary.opacity(0.8))
+                        }
+                        .padding(.vertical, 4)
+                    } else {
+                        ForEach(Array(checklistDraft.enumerated()), id: \.offset) { index, item in
+                            HStack {
+                                Image(systemName: "square.dashed")
+                                    .foregroundColor(.secondary)
+                                Text(item)
+                                    .lineLimit(2)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Button(role: .destructive) {
+                                    checklistDraft.remove(at: index)
+                                } label: {
+                                    Image(systemName: "trash")
+                                }
+                            }
+                        }
+                    }
+                    
+                    HStack {
+                        TextField("New checklist item", text: $newChecklistText)
+                            .textInputAutocapitalization(.sentences)
+                            .submitLabel(.done)
+                            .onSubmit(addChecklistItem)
+                        
+                        Button {
+                            addChecklistItem()
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .imageScale(.large)
+                        }
+                        .disabled(newChecklistText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                }
+            }
+            .navigationTitle("New Work Order")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        save()
+                    } label: {
+                        Image(systemName: "checkmark")
+                            .font(.headline)
+                    }
+                    .disabled(!canSave)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Helpers
+    
+    private var canSave: Bool {
+        !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !location.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    private func addChecklistItem() {
+        let trimmed = newChecklistText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        checklistDraft.append(trimmed)
+        newChecklistText = ""
+    }
+    
+    private func save() {
+        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedLocation = location.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedDescription = description.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedAssignee = assignedTo.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        viewModel.createWorkOrder(
+            title: trimmedTitle,
+            description: trimmedDescription,
+            location: trimmedLocation,
+            priority: priority,
+            assignedTo: trimmedAssignee.isEmpty ? nil : trimmedAssignee,
+            checklistTexts: checklistDraft
+        )
+        
+        dismiss()
+    }
+    
+    private func label(for priority: WorkOrderPriority) -> String {
+        switch priority {
+        case .low: return "Low"
+        case .medium: return "Medium"
+        case .high: return "High"
+        }
+    }
+}
+
 
 // MARK: - Previews
 

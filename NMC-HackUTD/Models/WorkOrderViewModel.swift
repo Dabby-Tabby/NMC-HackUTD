@@ -165,14 +165,6 @@ final class WorkOrderViewModel: ObservableObject {
     
     // MARK: - Intent methods (good for SwiftUI bindings)
     
-    func toggleChecklistItem(workOrderID: String, itemID: String) {
-        guard let workOrderIndex = workOrders.firstIndex(where: { $0.id == workOrderID }) else { return }
-        guard let itemIndex = workOrders[workOrderIndex].checklist.firstIndex(where: { $0.id == itemID }) else { return }
-        
-        workOrders[workOrderIndex].checklist[itemIndex].isDone.toggle()
-        workOrders[workOrderIndex].updatedAt = Date()
-    }
-    
     func updateStatus(workOrderID: String, to newStatus: WorkOrderStatus) {
         guard let index = workOrders.firstIndex(where: { $0.id == workOrderID }) else { return }
         workOrders[index].status = newStatus
@@ -185,17 +177,81 @@ final class WorkOrderViewModel: ObservableObject {
         workOrders[index].updatedAt = Date()
     }
     
+    // MARK: - Notes
+
     func addNote(to workOrderID: String, author: String, message: String) {
         guard let index = workOrders.firstIndex(where: { $0.id == workOrderID }) else { return }
         
-        let note = Note(
+        let newNote = Note(
             id: UUID().uuidString,
             author: author,
             message: message,
             createdAt: Date()
         )
         
-        workOrders[index].notes.append(note)
+        workOrders[index].notes.append(newNote)
         workOrders[index].updatedAt = Date()
     }
+
+    // MARK: - Create
+
+    func createWorkOrder(
+        title: String,
+        description: String,
+        location: String,
+        priority: WorkOrderPriority,
+        assignedTo: String?,
+        checklistTexts: [String] = []
+    ) {
+        let newID = "WO-\(Int(Date().timeIntervalSince1970))"
+        
+        let checklistItems = checklistTexts.map { text in
+            ChecklistItem(
+                id: UUID().uuidString,
+                text: text,
+                isDone: false
+            )
+        }
+        
+        let newWorkOrder = WorkOrder(
+            id: newID,
+            title: title,
+            description: description,
+            status: .new,
+            priority: priority,
+            location: location,
+            assignedTo: assignedTo,
+            checklist: checklistItems,
+            notes: [],
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+        
+        workOrders.insert(newWorkOrder, at: 0)
+    }
+    
+    // MARK: - Checklist Helpers
+
+    func addChecklistItem(to workOrderID: String, text: String) {
+        guard let index = workOrders.firstIndex(where: { $0.id == workOrderID }) else { return }
+        
+        let newItem = ChecklistItem(
+            id: UUID().uuidString,
+            text: text,
+            isDone: false
+        )
+        
+        workOrders[index].checklist.append(newItem)
+        workOrders[index].updatedAt = Date()
+    }
+
+    func toggleChecklistItem(workOrderID: String, itemID: String) {
+        guard let workOrderIndex = workOrders.firstIndex(where: { $0.id == workOrderID }) else { return }
+        guard let itemIndex = workOrders[workOrderIndex].checklist.firstIndex(where: { $0.id == itemID }) else { return }
+        
+        workOrders[workOrderIndex].checklist[itemIndex].isDone.toggle()
+        workOrders[workOrderIndex].updatedAt = Date()
+    }
+    
+    
 }
