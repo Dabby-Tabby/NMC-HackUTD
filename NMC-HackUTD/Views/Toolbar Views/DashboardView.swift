@@ -170,6 +170,7 @@ struct DashboardView: View {
             .toolbarBackground(Color("BoxBlue"), for: .bottomBar)
             .toolbarBackground(.visible, for: .bottomBar)
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 
