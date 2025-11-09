@@ -167,6 +167,34 @@ final class WorkOrderViewModel: ObservableObject {
         workOrders.filter { $0.status != .done }
     }
     
+    var completedWorkOrders: [WorkOrder] {
+        workOrders.filter { $0.status == .done }
+    }
+    
+    // MARK: - Status Updates
+
+    func markWorkOrderCompleted(id workOrderID: String) {
+        guard let index = workOrders.firstIndex(where: { $0.id == workOrderID }) else { return }
+
+        workOrders[index].status = .done
+        workOrders[index].updatedAt = Date()
+
+        // Persist if using SwiftData:
+        // upsertEntity(for: workOrders[index])
+    }
+
+    func reopenWorkOrder(id workOrderID: String) {
+        guard let index = workOrders.firstIndex(where: { $0.id == workOrderID }) else { return }
+
+        // Bring it back to an “active” status.
+        // You can choose .new or .inProgress; I’ll use .inProgress so it feels like picked back up.
+        workOrders[index].status = .inProgress
+        workOrders[index].updatedAt = Date()
+
+        // Persist if using SwiftData:
+        // upsertEntity(for: workOrders[index])
+    }
+    
     // MARK: - Intent methods (good for SwiftUI bindings)
     
     func updateStatus(workOrderID: String, to newStatus: WorkOrderStatus) {

@@ -83,6 +83,41 @@ struct WorkOrderListView: View {
                             }
                         }
                         .padding(.horizontal)
+                        
+                        if !viewModel.completedWorkOrders.isEmpty {
+                            HStack {
+                                Text("Completed")
+                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                    .foregroundColor(Color("TextWhite").opacity(0.6))
+                                Spacer()
+                            }
+                            .padding(.horizontal)
+                            .padding(.top, 16)
+
+                            VStack(spacing: 10) {
+                                ForEach(viewModel.completedWorkOrders) { workOrder in
+                                    NavigationLink {
+                                        WorkOrderDetailView(
+                                            workOrder: workOrder,
+                                            viewModel: viewModel
+                                        )
+                                    } label: {
+                                        WorkOrderRowView(workOrder: workOrder)
+                                            .opacity(0.6) // slightly faded to indicate done
+                                    }
+                                    .buttonStyle(.plain)
+                                    .overlay(
+                                        CrossHatchBackground(
+                                            lineColor: .white.opacity(0.01),
+                                            lineWidth: 0.8,
+                                            spacing: 10
+                                        )
+                                        .allowsHitTesting(false)
+                                    )
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
                     }
                     .padding(.vertical, 8)
                 }
@@ -166,6 +201,9 @@ struct WorkOrderDetailView: View {
     
     @State private var newTaskText: String = ""
     @State private var newNoteText: String = ""
+    private var isCompleted: Bool {
+        viewModel.workOrders.first(where: { $0.id == workOrder.id })?.status == .done
+    }
     
     var body: some View {
         ScrollView {
@@ -349,6 +387,50 @@ struct WorkOrderDetailView: View {
                             }
                         }
                     }
+                }
+                if !isCompleted {
+                    Button {
+                        viewModel.markWorkOrderCompleted(id: workOrder.id)
+                    } label: {
+                        HStack {
+                            Image(systemName: "checkmark.circle.fill")
+                            Text("Mark Work Order as Completed")
+                                .font(.system(.headline, design: .rounded))
+                        }
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.green.opacity(0.75))
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        .shadow(color: Color.black.opacity(0.4), radius: 10, x: 0, y: 6)
+                    }
+                    .padding(.top, 8)
+                } else {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "checkmark.seal.fill")
+                            Text("This work order is completed")
+                        }
+                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .foregroundColor(.green.opacity(0.8))
+
+                        Button {
+                            viewModel.reopenWorkOrder(id: workOrder.id)
+                        } label: {
+                            HStack {
+                                Image(systemName: "arrow.uturn.backward.circle.fill")
+                                Text("Mark as Incomplete")
+                                    .font(.system(.subheadline, design: .rounded))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
+                            .background(Color.orange.opacity(0.8))
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .shadow(color: Color.black.opacity(0.3), radius: 6, x: 0, y: 4)
+                        }
+                    }
+                    .padding(.top, 8)
                 }
             }
             .padding()
