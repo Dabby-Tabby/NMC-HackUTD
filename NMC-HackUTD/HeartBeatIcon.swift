@@ -3,7 +3,7 @@ import SwiftUI
 /// Solid-color heart that BEATS in sync with BPM (no rotating wave).
 struct HeartBeatIcon: View {
     var bpm: Double                 // live or simulated BPM
-    var color: Color = .red         // heart fill
+    var color: Color = Color("DowngradeRed")         // heart fill
     var size: CGFloat = 54
     var glow: Bool = true           // breathing glow with the beat
 
@@ -25,7 +25,7 @@ struct HeartBeatIcon: View {
                     .foregroundStyle(color)
                     .overlay(alignment: .center) {            // ✅ use foregroundStyle, not fill
                         heartShape
-                            .foregroundStyle(.white.opacity(0.12 + 0.28 * beat))
+                            .foregroundStyle(.white.opacity(0.05 + 0.1 * beat))
                             .blendMode(.screen)
                     }
                     .compositingGroup()                       // ensures blend before mask if you add one later
@@ -35,11 +35,11 @@ struct HeartBeatIcon: View {
                     heartShape
                         .foregroundStyle(color)
                         .blur(radius: 10 * beat)
-                        .opacity(0.45 * beat)
+                        .opacity(0.1 * beat)
                 }
             }
             // Scale pop = the beat
-            .scaleEffect(1.0 + 0.10 * beat)
+            .scaleEffect(1.0 + 0.02 * beat)
             .frame(width: size, height: size)
             .accessibilityLabel("Heart rate \(Int(clampedBPM)) beats per minute")
         }
