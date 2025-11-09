@@ -27,6 +27,9 @@ final class PhoneSessionManager: NSObject, ObservableObject {
     /// Per-peer vitals dictionary
     @Published var peerVitals: [String: (heart: Double, oxygen: Double, energy: Double)] = [:]
 
+    /// Per-peer work orders (decoded from MC messages)
+    @Published var peerWorkOrders: [String: [WorkOrder]] = [:]
+
     // MARK: - Multipeer Connectivity
     private let serviceType = "pulselink-peer"
     private var peerID: MCPeerID!
@@ -129,6 +132,60 @@ final class PhoneSessionManager: NSObject, ObservableObject {
             print("📤 Ping sent to \(peer.displayName)")
         } catch {
             print("❌ Ping send error: \(error.localizedDescription)")
+        }
+    }
+
+    // MARK: - Work Orders over MC
+
+    /// Request work orders from a specific peer
+    func requestWorkOrders(from peer: MCPeerID) {
+        guard let session = mcSession else { return }
+        let msg: [String: Any] = [
+            "type": "requestWorkOrders",
+            "from": myDisplayName
+        ]
+        do {
+            let data = try NSKeyedArchiver.archivedData(withRootObject: msg, requiringSecureCoding: false)
+            try session.send(data, toPeers: [peer], with: .reliable)
+            print("📤 Requested work orders from \(peer.displayName)")
+        } catch {
+            print("❌ requestWorkOrders send error: \(error.localizedDescription)")
+        }
+    }
+
+    /// Send our current work orders to a specific peer
+    func sendWorkOrders(to peer: MCPeerID, orders: [WorkOrder]) {
+        guard let session = mcSession else { return }
+        do {
+            let payload = try JSONEncoder().encode(orders)
+            let msg: [String: Any] = [
+                "type": "workOrders",
+                "from": myDisplayName,
+                "payload": payload
+            ]
+            let data = try NSKeyedArchiver.archivedData(withRootObject: msg, requiringSecureCoding: false)
+            try session.send(data, toPeers: [peer], with: .reliable)
+            print("📤 Sent \(orders.count) work orders to \(peer.displayName)")
+        } catch {
+            print("❌ workOrders encode/send error: \(error.localizedDescription)")
+        }
+    }
+
+    /// Broadcast our current work orders to all connected peers
+    func broadcastWorkOrders(_ orders: [WorkOrder]) {
+        guard let session = mcSession, !session.connectedPeers.isEmpty else { return }
+        do {
+            let payload = try JSONEncoder().encode(orders)
+            let msg: [String: Any] = [
+                "type": "workOrders",
+                "from": myDisplayName,
+                "payload": payload
+            ]
+            let data = try NSKeyedArchiver.archivedData(withRootObject: msg, requiringSecureCoding: false)
+            try session.send(data, toPeers: session.connectedPeers, with: .reliable)
+            print("📤 Broadcasted \(orders.count) work orders to \(session.connectedPeers.count) peers")
+        } catch {
+            print("⚠️ workOrders broadcast error: \(error.localizedDescription)")
         }
     }
 
@@ -248,6 +305,28 @@ extension PhoneSessionManager: MCSessionDelegate {
                 print("📥 Updated vitals for \(sender): HR \(Int(hr)), O₂ \(Int(ox)), Energy \(Int(en))")
             }
 
+        case "requestWorkOrders":
+            // Reply with our current work orders (using mock data here)
+            // Replace WorkOrder.mockData with your real source if available.
+            let orders = WorkOrder.mockData
+            print("📨 requestWorkOrders from \(peerID.displayName). Replying with \(orders.count) orders.")
+            self.sendWorkOrders(to: peerID, orders: orders)
+
+        case "workOrders":
+            guard
+                let sender = message["from"] as? String,
+                let payload = message["payload"] as? Data
+            else { return }
+            do {
+                let orders = try JSONDecoder().decode([WorkOrder].self, from: payload)
+                DispatchQueue.main.async {
+                    self.peerWorkOrders[sender] = orders
+                    print("📥 Stored \(orders.count) work orders for \(sender)")
+                }
+            } catch {
+                print("❌ Failed to decode work orders: \(error.localizedDescription)")
+            }
+
         default: break
         }
     }
@@ -351,3 +430,4 @@ extension PhoneSessionManager: WCSessionDelegate {
         print("📶 Reachability changed: \(session.isReachable)")
     }
 }
+
