@@ -143,33 +143,6 @@ struct DashboardView: View {
                     .animation(.spring(), value: session.lastPingFrom)
                 }
             }
-
-            // 🔹 Toolbar
-            .toolbar {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    HStack(spacing: 16) {
-                        NavigationLink(destination: DashboardView().environmentObject(session)) {
-                            Image(systemName: "heart.text.clipboard.fill")
-                        }
-                        .padding(.leading, 12)
-
-                        Divider().frame(height: 20).background(Color.white.opacity(0.3))
-
-                        NavigationLink(destination: WorkOrderListView().environmentObject(session)) {
-                            Image(systemName: "list.clipboard.fill")
-                        }
-
-                        Divider().frame(height: 20).background(Color.white.opacity(0.3))
-
-                        NavigationLink(destination: NomiAssistantView().environmentObject(session)) {
-                            Image(systemName: "cpu.fill")
-                        }
-                        .padding(.trailing, 12)
-                    }
-                }
-            }
-            .toolbarBackground(Color("BoxBlue"), for: .bottomBar)
-            .toolbarBackground(.visible, for: .bottomBar)
         }
         .navigationBarBackButtonHidden(true)
     }

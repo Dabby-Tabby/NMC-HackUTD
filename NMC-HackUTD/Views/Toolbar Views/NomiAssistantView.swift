@@ -22,9 +22,6 @@ struct NomiAssistantView: View {
                 mainContent
             }
             .navigationBarBackButtonHidden(true)
-            .toolbar { bottomToolbar }
-            .toolbarBackground(Color("BoxBlue"), for: .bottomBar)
-            .toolbarBackground(.visible, for: .bottomBar)
         }
     }
 }
@@ -173,29 +170,6 @@ extension NomiAssistantView {
         .padding(.horizontal)
     }
 
-    // MARK: Toolbar
-    private var bottomToolbar: some ToolbarContent {
-        ToolbarItemGroup(placement: .bottomBar) {
-            HStack(spacing: 16) {
-                NavigationLink(destination: DashboardView()) {
-                    Image(systemName: "heart.text.clipboard.fill")
-                }
-
-                Divider().frame(height: 20).background(Color.white.opacity(0.3))
-
-                NavigationLink(destination: WorkOrderListView()) {
-                    Image(systemName: "list.clipboard.fill")
-                }
-
-                Divider().frame(height: 20).background(Color.white.opacity(0.3))
-
-                NavigationLink(destination: NomiAssistantView()) {
-                    Image(systemName: "cpu.fill").foregroundColor(.green)
-                }
-            }
-        }
-    }
-
     // MARK: Helpers
     private func sendPrompt() {
         let trimmed = userInput.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -203,4 +177,10 @@ extension NomiAssistantView {
         viewModel.sendMessage(trimmed)
         userInput = ""
     }
+}
+
+
+#Preview {
+    NomiAssistantView()
+        .preferredColorScheme(.dark)
 }
