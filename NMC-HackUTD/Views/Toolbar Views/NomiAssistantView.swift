@@ -132,10 +132,14 @@ extension NomiAssistantView {
     private func chatMessageBubble(for msg: ChatMessage) -> some View {
         VStack(alignment: msg.sender == .user ? .trailing : .leading, spacing: 4) {
             ChatBubble(
-                text: msg.text,
+                text: msg.text.isEmpty ? "Listening..." : msg.text,
                 isUser: msg.sender == .user,
-                color: msg.sender == .user ? Color.accentColor : Color("BoxBlue")
+                color: msg.sender == .user
+                    ? (msg.id == viewModel.liveMessageID ? Color.accentColor.opacity(0.6) : Color.accentColor)
+                    : Color("BoxBlue")
             )
+            .animation(.easeInOut(duration: 0.1), value: msg.text)
+
 
             if msg.sender == .nomi {
                 Button {
