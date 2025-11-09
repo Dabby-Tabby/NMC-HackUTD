@@ -160,7 +160,7 @@ struct DashboardView: View {
 
                         Divider().frame(height: 20).background(Color.white.opacity(0.3))
 
-                        NavigationLink(destination: BuddyView().environmentObject(session)) {
+                        NavigationLink(destination: NomiAssistantView().environmentObject(session)) {
                             Image(systemName: "cpu.fill")
                         }
                         .padding(.trailing, 12)
