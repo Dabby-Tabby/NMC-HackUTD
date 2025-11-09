@@ -8,8 +8,14 @@
 import SwiftUI
 import MultipeerConnectivity
 
+private enum Keys {
+    static let displayName = "PulseLinkDisplayName"
+}
+
 struct ContentView: View {
     @StateObject private var session = PhoneSessionManager()
+    @StateObject private var onboarding = OnboardingCoordinator()
+    @State private var showPeerOrdersFor: MCPeerID? = nil
     
     var body: some View {
         NavigationStack {
@@ -61,15 +67,23 @@ struct ContentView: View {
                             VStack(spacing: 20) {
                                 ForEach(session.connectedPeers, id: \.self) { peer in
                                     let vitals = session.peerVitals[peer.displayName]
-                                    EmployeeCard(
-                                        employee: Employee(
-                                            name: peer.displayName,
-                                            heartRate: vitals?.heart,
-                                            oxygen: vitals?.oxygen,
-                                            energy: vitals?.energy
-                                        ),
-                                        onPing: {} // iPad doesn't send pings
-                                    )
+                                    
+                                    // Make the entire card tappable to open work orders
+                                    Button {
+                                        session.requestWorkOrders(from: peer)
+                                        showPeerOrdersFor = peer
+                                    } label: {
+                                        EmployeeCard(
+                                            employee: Employee(
+                                                name: peer.displayName,
+                                                heartRate: vitals?.heart,
+                                                oxygen: vitals?.oxygen,
+                                                energy: vitals?.energy
+                                            ),
+                                            onPing: {} // iPad doesn't send pings
+                                        )
+                                    }
+                                    .buttonStyle(.plain) // preserve card styling without button chrome
                                 }
                             }
                             .padding(.horizontal)
@@ -77,17 +91,76 @@ struct ContentView: View {
                         }
                     }
                 }
+                
+                // Onboarding overlays
+                switch onboarding.step {
+                case .launch:
+                    LaunchView()
+                        .environmentObject(onboarding)
+                        .transition(.opacity)
+                        .zIndex(1)
+                        .onChange(of: onboarding.step) { _, new in
+                            if new == .permissions {
+                                onboarding.step = .nameSetup
+                            }
+                        }
+                case .permissions:
+                    Color.clear.onAppear {
+                        onboarding.step = .nameSetup
+                    }
+                    .zIndex(1)
+                case .nameSetup:
+                    NameSetupView()
+                        .environmentObject(session)
+                        .environmentObject(onboarding)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .zIndex(1)
+                        .onChange(of: onboarding.step) { _, new in
+                            if new == .completed {
+                                let name = session.myDisplayName
+                                UserDefaults.standard.set(name, forKey: Keys.displayName)
+                                if name.isEmpty == false {
+                                    session.startAdvertising()
+                                }
+                            }
+                        }
+                case .completed:
+                    EmptyView()
+                }
+            }
+            .navigationDestination(item: $showPeerOrdersFor) { peer in
+                PeerWorkOrdersView(peerName: peer.displayName)
+                    .environmentObject(session)
             }
         }
         .onAppear {
-            session.myDisplayName = "iPad Dashboard"
-            session.startAdvertising()
+            if let saved = UserDefaults.standard.string(forKey: Keys.displayName),
+               saved.isEmpty == false {
+                session.updateDisplayName(saved)
+                onboarding.step = .completed
+            } else {
+                session.myDisplayName = "iPad Dashboard"
+                onboarding.step = .launch
+            }
+            if onboarding.step == .completed {
+                session.startAdvertising()
+            }
         }
     }
 }
 
-#Preview {
-    ContentView()
-        .environmentObject(MockSessionManager().base)
-        .preferredColorScheme(.dark)
+#Preview("Card opens work orders") {
+// Seed a saved display name so onboarding completes immediately
+
+UserDefaults.standard.set("Preview User", forKey: "PulseLinkDisplayName")
+
+
+return ContentView()
+
+    .environmentObject(MockSessionManager().base)
+
+    .preferredColorScheme(.dark)
+
+    .previewLayout(.fixed(width: 1024, height: 768))
+
 }
