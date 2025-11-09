@@ -35,82 +35,47 @@ struct WorkOrderListView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(.systemIndigo).opacity(0.5),
-                        Color(.black)
-                    ]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
+                Color("BackgroundBlue")
+                    .overlay(CrossHatchBackground(lineColor: .white.opacity(0.02), lineWidth: 0.3, spacing: 30))
+                    .ignoresSafeArea()
                 
-                List {
-                    Section {
-                        ForEach(viewModel.activeWorkOrders) { workOrder in
-                            NavigationLink {
-                                WorkOrderDetailView(
-                                    workOrder: workOrder,
-                                    viewModel: viewModel
-                                )
-                            } label: {
-                                WorkOrderRowView(workOrder: workOrder)
-                            }
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-                        }
-                    } header: {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
                         Text("Active Work Orders")
                             .font(.headline)
                             .foregroundColor(.dashboardTextSecondary)
+                            .padding(.horizontal)
+                        
+                        VStack(spacing: 10) {
+                            ForEach(viewModel.activeWorkOrders) { workOrder in
+                                NavigationLink {
+                                    WorkOrderDetailView(
+                                        workOrder: workOrder,
+                                        viewModel: viewModel
+                                    )
+                                } label: {
+                                    WorkOrderRowView(workOrder: workOrder)
+                                }
+                                .buttonStyle(.plain)
+                                .overlay(
+                                    CrossHatchBackground(
+                                        lineColor: .white.opacity(0.01),
+                                        lineWidth: 0.8,
+                                        spacing: 10
+                                    )
+                                )
+                            }
+                        }
+                        .padding(.horizontal)
                     }
-                }
-                .scrollContentBackground(.hidden)
-                .listStyle(.plain)
-                .navigationTitle("Work Orders")
-                .toolbarBackground(.visible, for: .navigationBar)
-                .toolbarBackground(
-                    LinearGradient(
-                        colors: [.dashboardBackgroundTop.opacity(0.98),
-                                 .dashboardBackgroundTop.opacity(0.9)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    ),
-                    for: .navigationBar
-                )
-                .toolbarColorScheme(.dark, for: .navigationBar)
-            }
-            // ✅ Toolbar at correct placement (outside List)
-            .toolbar {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    HStack(spacing: 16) {
-                        NavigationLink(destination: DashboardView()) {
-                            Image(systemName: "heart.text.clipboard.fill")
-                        }
-                        .padding(.leading, 12)
-
-                        Divider()
-                            .frame(height: 20)
-                            .background(Color.white.opacity(0.3))
-
-                        NavigationLink(destination: WorkOrderListView()) {
-                            Image(systemName: "list.clipboard.fill")
-                        }
-
-                        Divider()
-                            .frame(height: 20)
-                            .background(Color.white.opacity(0.3))
-
-                        NavigationLink(destination: BuddyView()) {
-                            Image(systemName: "cpu.fill")
-                        }
-                        .padding(.trailing, 12)
-                    }
+                    .padding(.vertical, 8)
                 }
             }
-            .toolbarBackground(Color("BoxBlue"), for: .bottomBar)
-            .toolbarBackground(.visible, for: .bottomBar)
+
+            .navigationTitle("Work Orders")
+            .toolbarColorScheme(.dark, for: .navigationBar)
         }
+        .tint(.dashboardAccentBlue)
     }
 }
 
@@ -306,36 +271,6 @@ struct WorkOrderDetailView: View {
         )
         .navigationTitle("Work Order")
         .navigationBarTitleDisplayMode(.inline)
-        // ✅ Toolbar correctly placed here, not inside ScrollView
-        .toolbar {
-            ToolbarItemGroup(placement: .bottomBar) {
-                HStack(spacing: 16) {
-                    NavigationLink(destination: DashboardView()) {
-                        Image(systemName: "heart.text.clipboard.fill")
-                    }
-                    .padding(.leading, 12)
-
-                    Divider()
-                        .frame(height: 20)
-                        .background(Color.white.opacity(0.3))
-
-                    NavigationLink(destination: WorkOrderListView()) {
-                        Image(systemName: "list.clipboard.fill")
-                    }
-
-                    Divider()
-                        .frame(height: 20)
-                        .background(Color.white.opacity(0.3))
-
-                    NavigationLink(destination: BuddyView()) {
-                        Image(systemName: "cpu.fill")
-                    }
-                    .padding(.trailing, 12)
-                }
-            }
-        }
-        .toolbarBackground(Color("BoxBlue"), for: .bottomBar)
-        .toolbarBackground(.visible, for: .bottomBar)
     }
 }
 
