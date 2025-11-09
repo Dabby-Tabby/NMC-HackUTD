@@ -2,7 +2,7 @@ import Foundation
 
 func sendToGemini(_ userText: String) async throws -> String {
     // Your OpenRouter API key (keep private!)
-    let apiKey = "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"
+    let apiKey = ProcessInfo.processInfo.environment["OPENROUTER_API_KEY"] ?? ""
 
     // OpenRouter endpoint
     guard let url = URL(string: "https://openrouter.ai/api/v1/chat/completions") else {

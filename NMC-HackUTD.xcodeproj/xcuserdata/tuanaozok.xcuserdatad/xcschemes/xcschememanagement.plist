@@ -7,20 +7,25 @@
 		<key>NMC-HackUTD.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-<<<<<<< Updated upstream
 			<integer>0</integer>
-=======
-			<integer>1</integer>
->>>>>>> Stashed changes
 		</dict>
 		<key>Watch-NMC-HackUTD Watch App.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-<<<<<<< Updated upstream
 			<integer>1</integer>
-=======
-			<integer>0</integer>
->>>>>>> Stashed changes
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>2EF68BBD2EC00ECC005448FF</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>2EF68BCF2EC00FE3005448FF</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>
