@@ -11,7 +11,7 @@ import Neumorphic
 struct NomiAssistantView: View {
     // MARK: - Environment & State
     @EnvironmentObject var session: PhoneSessionManager
-    @StateObject private var workOrderViewModel = WorkOrderViewModel()
+    @EnvironmentObject var workOrderViewModel: WorkOrderViewModel   // ✅ use shared instance
     @StateObject private var viewModel: NomiAssistantViewModel
     @Namespace private var bottomID
     @State private var userInput = ""
@@ -19,12 +19,11 @@ struct NomiAssistantView: View {
     private let textOpacity: Double = 0.85
 
     // MARK: - Custom Init (personalized greeting)
-    init(session: PhoneSessionManager) {
-        _workOrderViewModel = StateObject(wrappedValue: WorkOrderViewModel())
+    init(session: PhoneSessionManager, workOrderViewModel: WorkOrderViewModel) {
         _viewModel = StateObject(
             wrappedValue: NomiAssistantViewModel(
-                userName: session.myDisplayName,
-                workOrderViewModel: WorkOrderViewModel()
+                userName: session.myDisplayName.isEmpty ? "Technician" : session.myDisplayName,
+                workOrderViewModel: workOrderViewModel
             )
         )
     }
@@ -41,6 +40,7 @@ struct NomiAssistantView: View {
         }
     }
 }
+
 
 // MARK: - Subviews
 extension NomiAssistantView {
@@ -206,11 +206,11 @@ extension NomiAssistantView {
     }
 }
 
-#Preview {
-    NomiAssistantView(session: PhoneSessionManager())
-        .environmentObject(PhoneSessionManager())
-        .preferredColorScheme(.dark)
-}
+//#Preview {
+//    NomiAssistantView(session: PhoneSessionManager())
+//        .environmentObject(PhoneSessionManager())
+//        .preferredColorScheme(.dark)
+//}
 
 // MARK: - Dismiss Keyboard Helper
 extension View {

@@ -16,6 +16,7 @@ enum AppTab: Hashable {
 
 struct NmcAppShell: View {
     @EnvironmentObject var session: PhoneSessionManager
+    @EnvironmentObject var workOrderViewModel: WorkOrderViewModel
     
     @State private var selectedTab: AppTab = .dashboard
     @State private var hasCompletedOnboarding = false
@@ -103,12 +104,16 @@ struct NmcAppShell: View {
             case .dashboard:
                 DashboardView()
                     .environmentObject(session)
+                
             case .workOrders:
                 WorkOrderListView()
                     .environmentObject(session)
+                    .environmentObject(workOrderViewModel)
+                
             case .nomi:
-                NomiAssistantView(session: session)
+                NomiAssistantView(session: session, workOrderViewModel: workOrderViewModel)
                     .environmentObject(session)
+                    .environmentObject(workOrderViewModel)
             }
         }
     }

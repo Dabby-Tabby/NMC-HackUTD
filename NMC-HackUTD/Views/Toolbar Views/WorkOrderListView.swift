@@ -15,7 +15,7 @@ private let textOpacitySecondary: Double = 0.65
 // MARK: - List View
 struct WorkOrderListView: View {
     @EnvironmentObject var session: PhoneSessionManager
-    @StateObject private var viewModel = WorkOrderViewModel()
+    @EnvironmentObject var viewModel: WorkOrderViewModel
     @State private var isPresentingNewWorkOrder = false
     
     var body: some View {
@@ -64,10 +64,7 @@ struct WorkOrderListView: View {
                         VStack(spacing: 10) {
                             ForEach(viewModel.activeWorkOrders) { workOrder in
                                 NavigationLink {
-                                    WorkOrderDetailView(
-                                        workOrder: workOrder,
-                                        viewModel: viewModel
-                                    )
+                                    WorkOrderDetailView(workOrder: workOrder)
                                 } label: {
                                     WorkOrderRowView(workOrder: workOrder)
                                 }
@@ -97,14 +94,12 @@ struct WorkOrderListView: View {
                             VStack(spacing: 10) {
                                 ForEach(viewModel.completedWorkOrders) { workOrder in
                                     NavigationLink {
-                                        WorkOrderDetailView(
-                                            workOrder: workOrder,
-                                            viewModel: viewModel
-                                        )
+                                        WorkOrderDetailView(workOrder: workOrder)
                                     } label: {
                                         WorkOrderRowView(workOrder: workOrder)
-                                            .opacity(0.6) // slightly faded to indicate done
+                                            .opacity(0.6)
                                     }
+
                                     .buttonStyle(.plain)
                                     .overlay(
                                         CrossHatchBackground(
@@ -124,7 +119,8 @@ struct WorkOrderListView: View {
             }
         }
         .sheet(isPresented: $isPresentingNewWorkOrder) {
-            NewWorkOrderSheet(viewModel: viewModel)
+            NewWorkOrderSheet()
+                .environmentObject(viewModel)
         }
     }
 }
@@ -196,7 +192,7 @@ struct WorkOrderRowView: View {
 
 struct WorkOrderDetailView: View {
     let workOrder: WorkOrder
-    @ObservedObject var viewModel: WorkOrderViewModel
+    @EnvironmentObject var viewModel: WorkOrderViewModel
     @EnvironmentObject var session: PhoneSessionManager
     
     @State private var newTaskText: String = ""
@@ -569,7 +565,7 @@ private extension WorkOrder {
 
 struct NewWorkOrderSheet: View {
     @Environment(\.dismiss) private var dismiss
-    @ObservedObject var viewModel: WorkOrderViewModel
+    @EnvironmentObject var viewModel: WorkOrderViewModel
     
     @EnvironmentObject var session: PhoneSessionManager
     
@@ -733,14 +729,14 @@ struct WorkOrderListView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             WorkOrderListView()
+                .environmentObject(WorkOrderViewModel())
                 .preferredColorScheme(.dark)
-            
+
             NavigationStack {
-                WorkOrderDetailView(
-                    workOrder: WorkOrder.mock1,
-                    viewModel: WorkOrderViewModel()
-                )
+                WorkOrderDetailView(workOrder: WorkOrder.mock1)
+                    .environmentObject(WorkOrderViewModel())
             }
+
             .preferredColorScheme(.dark)
         }
     }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PeerWorkOrdersView: View {
     @EnvironmentObject var session: PhoneSessionManager
+    @EnvironmentObject var viewModel: WorkOrderViewModel
     let peerName: String
     
     var orders: [WorkOrder] {
@@ -31,8 +32,7 @@ struct PeerWorkOrdersView: View {
                         VStack(spacing: 16) {
                             ForEach(orders) { workOrder in
                                 NavigationLink {
-                                    WorkOrderDetailView(workOrder: workOrder,
-                                                        viewModel: WorkOrderViewModel(workOrders: orders))
+                                    WorkOrderDetailView(workOrder: workOrder)
                                 } label: {
                                     WorkOrderRowView(workOrder: workOrder)
                                 }
@@ -48,6 +48,7 @@ struct PeerWorkOrdersView: View {
         }
     }
 }
+
 
 #Preview {
     PeerWorkOrdersView(peerName: "Jacob")
