@@ -1,4 +1,10 @@
-// ContentView.swift (watch target)
+//
+//  ContentView.swift
+//  Watch-NMC-HackUTD Watch App
+//
+//  Created by Nick Watts on 11/8/25.
+//
+
 import SwiftUI
 import WatchConnectivity
 
@@ -6,15 +12,28 @@ struct ContentView: View {
     @StateObject private var health = HealthDataManager()
     
     var body: some View {
-        VStack(spacing: 8) {
-            Text("PulseLink")
-                .font(.headline)
+        ZStack {
+            VStack(spacing: 8) {
+                Text("PulseLink")
+                    .font(.headline)
+                    .padding(.bottom, 4)
+                
+                // Live vitals
+                Text("❤️ HR: \(Int(health.heartRate)) bpm")
+                Text("🫁 O₂: \(Int(health.oxygen))%")
+                Text("🔥 Energy: \(Int(health.energy)) kcal")
+            }
+            .padding()
             
-            // You can show live vitals if you want:
-            Text("HR: \(Int(health.heartRate)) bpm")
-            Text("O₂: \(Int(health.oxygen))%")
-            Text("Energy: \(Int(health.energy)) kcal")
+            // ✅ Ping banner overlay (appears + fades automatically)
+            if health.showPingBanner {
+                PingBanner()
+            }
         }
-        .padding()
+        .animation(.spring(), value: health.showPingBanner)
     }
+}
+
+#Preview {
+    ContentView()
 }

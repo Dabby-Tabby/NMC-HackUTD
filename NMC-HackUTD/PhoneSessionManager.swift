@@ -12,6 +12,7 @@ import UserNotifications
 import UIKit
 import Combine
 import SwiftUI
+import CoreHaptics
 
 final class PhoneSessionManager: NSObject, ObservableObject {
     // MARK: - Published Data
@@ -37,10 +38,14 @@ final class PhoneSessionManager: NSObject, ObservableObject {
     // MARK: - WatchConnectivity
     private var wcSession: WCSession?
 
+    // MARK: - Core Haptics
+    private var hapticEngine: CHHapticEngine?
+
     // MARK: - Init
     override init() {
         super.init()
         requestNotificationPermission()
+        prepareHaptics()
 
         if WCSession.isSupported() {
             let wc = WCSession.default
@@ -58,19 +63,16 @@ final class PhoneSessionManager: NSObject, ObservableObject {
         myDisplayName = name
         print("🪪 Updating display name to \(name)")
 
-        // stop old advertising/browsing first
         advertiser?.stopAdvertisingPeer()
         advertiser?.delegate = nil
         browser?.stopBrowsingForPeers()
         browser?.delegate = nil
         mcSession?.disconnect()
 
-        // recreate peer/session
         peerID = MCPeerID(displayName: myDisplayName)
         mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
         mcSession.delegate = self
 
-        // delay restart for Bonjour cleanup
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.advertiser = MCNearbyServiceAdvertiser(peer: self.peerID,
                                                         discoveryInfo: nil,
@@ -146,6 +148,52 @@ final class PhoneSessionManager: NSObject, ObservableObject {
         let req = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
         UNUserNotificationCenter.current().add(req)
     }
+
+    // MARK: - Haptics
+    private func prepareHaptics() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else {
+            print("⚠️ Device does not support haptics.")
+            return
+        }
+        do {
+            hapticEngine = try CHHapticEngine()
+            try hapticEngine?.start()
+            print("🎧 Haptic engine ready.")
+        } catch {
+            print("⚠️ Haptic engine error: \(error.localizedDescription)")
+        }
+    }
+
+    private func playLongHaptic() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+        do {
+            let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0)
+            let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+            let event = CHHapticEvent(eventType: .hapticContinuous,
+                                      parameters: [intensity, sharpness],
+                                      relativeTime: 0,
+                                      duration: 0.6)
+            let pattern = try CHHapticPattern(events: [event], parameters: [])
+            let player = try hapticEngine?.makePlayer(with: pattern)
+            try player?.start(atTime: 0)
+            print("🔊 Played long haptic buzz.")
+        } catch {
+            print("⚠️ Failed to play haptic: \(error.localizedDescription)")
+        }
+    }
+
+    // MARK: - Ping Watch
+    private func sendPingToWatch() {
+        guard let wcSession = wcSession, wcSession.isReachable else {
+            print("⌚️ Watch not reachable, playing local haptic instead.")
+            self.playLongHaptic()
+            return
+        }
+        wcSession.sendMessage(["type": "ping"], replyHandler: nil) { error in
+            print("⚠️ Failed to ping watch: \(error.localizedDescription)")
+        }
+        print("📲 Sent ping message to watch.")
+    }
 }
 
 // MARK: - MCSessionDelegate
@@ -181,8 +229,10 @@ extension PhoneSessionManager: MCSessionDelegate {
                 DispatchQueue.main.async {
                     self.lastPingFrom = from
                     self.postLocalNotification(from: from)
-                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 5) { self.lastPingFrom = nil }
+                    self.sendPingToWatch()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                        self.lastPingFrom = nil
+                    }
                 }
             }
 
@@ -273,8 +323,6 @@ extension PhoneSessionManager: WCSessionDelegate {
             self.oxygen = ox
             self.energy = en
             self.isWatchSessionActive = true
-
-            // also store locally
             self.peerVitals[self.myDisplayName] = (hr, ox, en)
             print("📥 Received health from watch → HR \(Int(hr)), O₂ \(Int(ox)), Energy \(Int(en)) kcal")
             self.broadcastVitals()

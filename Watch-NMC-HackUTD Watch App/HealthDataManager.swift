@@ -9,6 +9,8 @@ import Foundation
 import HealthKit
 import WatchConnectivity
 import Combine
+import SwiftUI
+import WatchKit
 
 class HealthDataManager: NSObject, ObservableObject, WCSessionDelegate {
     // MARK: - Properties
@@ -20,7 +22,8 @@ class HealthDataManager: NSObject, ObservableObject, WCSessionDelegate {
     @Published var heartRate: Double = 0
     @Published var oxygen: Double = 0
     @Published var energy: Double = 0
-    
+    @Published var showPingBanner: Bool = false
+
     // MARK: - Init
     override init() {
         super.init()
@@ -36,10 +39,7 @@ class HealthDataManager: NSObject, ObservableObject, WCSessionDelegate {
             print("❌ WCSession not supported on this watch")
         }
         
-        // Request HealthKit permissions and begin tracking
         requestHealthAuthorization()
-        
-        // Start automatic sender loop (every few seconds)
         startAutoSendLoop()
     }
     
@@ -70,7 +70,6 @@ class HealthDataManager: NSObject, ObservableObject, WCSessionDelegate {
         }
     }
     
-    // MARK: - Background Delivery
     private func enableBackgroundDelivery(for types: Set<HKSampleType>) {
         for type in types {
             healthStore.enableBackgroundDelivery(for: type, frequency: .immediate) { success, error in
@@ -83,7 +82,6 @@ class HealthDataManager: NSObject, ObservableObject, WCSessionDelegate {
         }
     }
     
-    // MARK: - Start Queries
     private func startAllQueries() {
         startQuery(for: .heartRate)
         startQuery(for: .oxygenSaturation)
@@ -99,12 +97,10 @@ class HealthDataManager: NSObject, ObservableObject, WCSessionDelegate {
         query.updateHandler = { _, samples, _, _, _ in
             self.handle(samples)
         }
-        
         healthStore.execute(query)
         print("📈 Started query for \(identifier.rawValue)")
     }
     
-    // MARK: - Handle Samples
     private func handle(_ samples: [HKSample]?) {
         guard let samples = samples as? [HKQuantitySample],
               let last = samples.last else { return }
@@ -113,16 +109,10 @@ class HealthDataManager: NSObject, ObservableObject, WCSessionDelegate {
             switch last.quantityType.identifier {
             case HKQuantityTypeIdentifier.heartRate.rawValue:
                 self.heartRate = last.quantity.doubleValue(for: HKUnit(from: "count/min"))
-                print("❤️ Heart rate: \(self.heartRate) bpm")
-                
             case HKQuantityTypeIdentifier.oxygenSaturation.rawValue:
                 self.oxygen = last.quantity.doubleValue(for: .percent()) * 100
-                print("🫁 O₂ Saturation: \(self.oxygen)%")
-                
             case HKQuantityTypeIdentifier.activeEnergyBurned.rawValue:
                 self.energy = last.quantity.doubleValue(for: .kilocalorie())
-                print("🔥 Energy: \(self.energy) kcal")
-                
             default: break
             }
         }
@@ -137,7 +127,6 @@ class HealthDataManager: NSObject, ObservableObject, WCSessionDelegate {
             }
     }
     
-    // MARK: - Send Data to iPhone
     private func sendToPhone() {
         guard let session = session, session.isReachable else {
             print("📵 Phone not reachable, skipping send.")
@@ -154,7 +143,6 @@ class HealthDataManager: NSObject, ObservableObject, WCSessionDelegate {
         session.sendMessage(payload, replyHandler: nil) { error in
             print("⚠️ Send error: \(error.localizedDescription)")
         }
-        print("📤 Sent to phone: HR \(Int(heartRate)), O₂ \(Int(oxygen))%, Energy \(Int(energy)) kcal")
     }
     
     // MARK: - WCSessionDelegate
@@ -168,8 +156,36 @@ class HealthDataManager: NSObject, ObservableObject, WCSessionDelegate {
         print("📶 Reachability changed: \(session.isReachable)")
     }
     
-    // iOS 17+ compatibility
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         print("📩 Received message from phone: \(message)")
+        if message["type"] as? String == "ping" {
+            WKInterfaceDevice.current().play(.notification)
+            DispatchQueue.main.async {
+                withAnimation(.spring()) {
+                    self.showPingBanner = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    withAnimation(.easeOut) {
+                        self.showPingBanner = false
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Ping Banner View
+struct PingBanner: View {
+    var body: some View {
+        VStack {
+            Spacer()
+            Text("📡 Ping received!")
+                .font(.headline)
+                .padding()
+                .background(Color.blue.opacity(0.8))
+                .cornerRadius(12)
+                .padding(.bottom, 16)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
     }
 }
