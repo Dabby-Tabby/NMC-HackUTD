@@ -4,6 +4,11 @@
 //
 //  Created by Nick Watts on 11/8/25.
 //
+//  DashboardView.swift
+//  NMC-HackUTD
+//
+//  Created by Nick Watts on 11/8/25.
+//
 
 import SwiftUI
 import Neumorphic
@@ -14,7 +19,8 @@ private let textOpacity: Double = 0.8
 // MARK: - Dashboard
 struct DashboardView: View {
     @EnvironmentObject var session: PhoneSessionManager
-    
+    private var isWatchConnected: Bool { session.isWatchSessionActive }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -35,7 +41,7 @@ struct DashboardView: View {
                             .foregroundColor(Color("TextWhite").opacity(textOpacity))
                             .padding(.top, 10)
                             .shadow(color: Color("TextWhite").opacity(0.4), radius: 3)
-                        
+
                         // Current user banner
                         HStack {
                             Image(systemName: "person.crop.circle.fill.badge.checkmark")
@@ -63,15 +69,32 @@ struct DashboardView: View {
                         } else {
                             VStack(spacing: 20) {
                                 ForEach(session.connectedPeers, id: \.self) { peer in
+                                    // ✅ Lookup vitals by peer name
+                                    let vitals = session.peerVitals[peer.displayName]
+
                                     EmployeeCard(
                                         employee: Employee(
                                             name: peer.displayName,
-                                            heartRate: session.heartRate,
-                                            oxygen: session.oxygen,
-                                            energy: session.energy
+                                            heartRate: vitals?.heart,
+                                            oxygen: vitals?.oxygen,
+                                            energy: vitals?.energy
                                         )
                                     ) {
                                         session.sendPing(to: peer)
+                                    }
+                                }
+
+                                // ✅ Also show my own card
+                                if let myVitals = session.peerVitals[session.myDisplayName] {
+                                    EmployeeCard(
+                                        employee: Employee(
+                                            name: session.myDisplayName + " (You)",
+                                            heartRate: myVitals.heart,
+                                            oxygen: myVitals.oxygen,
+                                            energy: myVitals.energy
+                                        )
+                                    ) {
+                                        // no ping to self
                                     }
                                 }
                             }
@@ -98,11 +121,8 @@ struct DashboardView: View {
                             }
                             Spacer()
                             Button(action: {
-                                // ✅ Prevent modifying state during render
-                                DispatchQueue.main.async {
-                                    withAnimation(.spring()) {
-                                        session.lastPingFrom = nil
-                                    }
+                                withAnimation(.spring()) {
+                                    session.lastPingFrom = nil
                                 }
                             }) {
                                 Image(systemName: "xmark.circle.fill")
@@ -122,7 +142,8 @@ struct DashboardView: View {
                     .animation(.spring(), value: session.lastPingFrom)
                 }
             }
-            // 🔹 Toolbar Navigation
+
+            // 🔹 Toolbar
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
                     HStack(spacing: 16) {
@@ -131,17 +152,13 @@ struct DashboardView: View {
                         }
                         .padding(.leading, 12)
 
-                        Divider()
-                            .frame(height: 20)
-                            .background(Color.white.opacity(0.3))
+                        Divider().frame(height: 20).background(Color.white.opacity(0.3))
 
                         NavigationLink(destination: WorkOrderListView().environmentObject(session)) {
                             Image(systemName: "list.clipboard.fill")
                         }
 
-                        Divider()
-                            .frame(height: 20)
-                            .background(Color.white.opacity(0.3))
+                        Divider().frame(height: 20).background(Color.white.opacity(0.3))
 
                         NavigationLink(destination: BuddyView().environmentObject(session)) {
                             Image(systemName: "cpu.fill")
@@ -160,10 +177,11 @@ struct DashboardView: View {
 struct Employee: Identifiable {
     let id = UUID()
     let name: String
-    let heartRate: Double
-    let oxygen: Double
-    let energy: Double
+    let heartRate: Double?
+    let oxygen: Double?
+    let energy: Double?
 }
+
 
 // MARK: - Employee Card
 struct EmployeeCard: View {
@@ -184,7 +202,7 @@ struct EmployeeCard: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                 )
                 .overlay(
-                    WaveOverlay() // ✅ fixed version below
+                    WaveOverlay()
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                 )
                 .overlay(
@@ -207,30 +225,42 @@ struct EmployeeCard: View {
                 
                 HStack(alignment: .center) {
                     VStack(alignment: .leading, spacing: 14) {
-                        MetricRow(icon: {
-                            HeartBeatIcon(
-                                bpm: employee.heartRate,
-                                color: Color("DowngradeRed"),
-                                size: 24,
-                                glow: true
-                            )
-                        }, label: "\(Int(employee.heartRate)) bpm", color: Color("TextWhite"))
-                        
-                        MetricRow(icon: {
-                            LungsBreathIcon(
-                                brpm: 12,
-                                color: Color("BabyBlue"),
-                                size: 24,
-                                glow: true,
-                                airflow: true
-                            )
-                        }, label: "\(Int(employee.oxygen))%", color: Color("TextWhite"))
-                        
-                        MetricRow(icon: {
-                            Image(systemName: "flame.fill")
-                                .foregroundColor(Color("IncreaseGreen"))
-                                .frame(width: 24, height: 24)
-                        }, label: "\(Int(employee.energy)) kcal", color: Color("TextWhite"))
+                        MetricRow(
+                            icon: {
+                                HeartBeatIcon(
+                                    bpm: employee.heartRate ?? 0,
+                                    color: Color("DowngradeRed"),
+                                    size: 24,
+                                    glow: true
+                                )
+                            },
+                            label: employee.heartRate != nil ? "\(Int(employee.heartRate!)) bpm" : "N/A",
+                            color: Color("TextWhite")
+                        )
+
+                        MetricRow(
+                            icon: {
+                                LungsBreathIcon(
+                                    brpm: 12,
+                                    color: Color("BabyBlue"),
+                                    size: 24,
+                                    glow: true,
+                                    airflow: true
+                                )
+                            },
+                            label: employee.oxygen != nil ? "\(Int(employee.oxygen!))%" : "N/A",
+                            color: Color("TextWhite")
+                        )
+
+                        MetricRow(
+                            icon: {
+                                Image(systemName: "flame.fill")
+                                    .foregroundColor(Color("IncreaseGreen"))
+                                    .frame(width: 24, height: 24)
+                            },
+                            label: employee.energy != nil ? "\(Int(employee.energy!)) kcal" : "N/A",
+                            color: Color("TextWhite")
+                        )
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     
@@ -249,6 +279,7 @@ struct EmployeeCard: View {
         }
     }
 }
+
 
 // MARK: - Metric Row
 struct MetricRow<Icon: View>: View {

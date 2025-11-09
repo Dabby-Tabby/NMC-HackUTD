@@ -16,17 +16,14 @@ struct NameSetupView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                CrossHatchBackground(
-                    lineColor: .white.opacity(0.02),
-                    lineWidth: 0.3,
-                    spacing: 30
-                )
-                .background(Color("BackgroundBlue"))
-                .ignoresSafeArea()
+                // 🔹 Solid background for the whole view
+                Color("BackgroundBlue")
+                    .ignoresSafeArea()
 
                 VStack(spacing: 36) {
                     Spacer()
 
+                    // 🔹 Header
                     VStack(spacing: 10) {
                         Text("Identify Yourself")
                             .font(.system(size: 28, weight: .bold, design: .rounded))
@@ -39,6 +36,7 @@ struct NameSetupView: View {
                             .padding(.horizontal, 40)
                     }
 
+                    // 🔹 Text field card
                     ZStack {
                         RoundedRectangle(cornerRadius: 24, style: .continuous)
                             .fill(Color("BoxBlue"))
@@ -51,42 +49,48 @@ struct NameSetupView: View {
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
-                            )
-                            .overlay(
-                                CrossHatchBackground(
-                                    lineColor: .white.opacity(0.03),
-                                    lineWidth: 0.3,
-                                    spacing: 14
-                                )
-                                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                                .cornerRadius(20)
                             )
                             .shadow(color: Color("RoyalBlue").opacity(0.25), radius: 10, x: 0, y: 6)
                             .frame(height: 130)
                             .padding(.horizontal, 30)
 
                         VStack(spacing: 14) {
-                            TextField("e.g. Alex W.", text: $name)
-                                .font(.system(size: 20, weight: .semibold, design: .rounded))
-                                .foregroundColor(Color("TextWhite"))
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(Color.white.opacity(0.05))
-                                .cornerRadius(16)
-                                .padding(.horizontal, 30)
-                                .focused($isFocused)
-                                .submitLabel(.done)
-                                .onSubmit {
-                                    isFocused = false
-                                }
+                            // 🔹 Text field with crosshatch background only
+                            ZStack {
+                                // Crosshatch background precisely behind the text field
+                                CrossHatchBackground(
+                                    lineColor: .white.opacity(0.02),
+                                    lineWidth: 0.3,
+                                    spacing: 30
+                                )
+                                .frame(width: 320, height: 50) // apply frame here
+                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous)) // then clip
+
+                                // TextField overlay
+                                TextField("e.g. Alex W.", text: $name)
+                                    .font(.system(size: 20, weight: .semibold, design: .rounded))
+                                    .foregroundColor(Color("TextWhite"))
+                                    .padding()
+                                    .frame(width: 320, height: 50)
+                                    .background(Color.white.opacity(0.05))
+                                    .cornerRadius(16)
+                                    .focused($isFocused)
+                                    .submitLabel(.done)
+                                    .onSubmit { isFocused = false }
+                            }
+                            .padding(.horizontal, 30)
 
                             Text("This will be your PulseLink identity.")
                                 .font(.system(size: 13, weight: .medium, design: .rounded))
                                 .foregroundColor(Color("TextWhite").opacity(0.6))
+
                         }
                     }
 
                     Spacer()
 
+                    // 🔹 Continue button
                     Button(action: {
                         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
                         guard !trimmedName.isEmpty else { return }
@@ -109,6 +113,7 @@ struct NameSetupView: View {
                         .padding(.horizontal, 30)
                     }
 
+                    // 🔹 Navigation to Dashboard
                     NavigationLink(
                         destination: DashboardView()
                             .navigationBarBackButtonHidden(true),
