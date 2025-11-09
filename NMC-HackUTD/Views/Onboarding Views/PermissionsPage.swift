@@ -11,6 +11,8 @@ import AVFoundation
 
 struct PermissionsPage: View {
     @Environment(\.colorScheme) private var colorScheme
+    @EnvironmentObject var onboarding: OnboardingCoordinator
+    
     @State private var showingHealthPrompt = false
     @State private var showingMicPrompt = false
     @State private var navigateToNameSetup = false
@@ -83,13 +85,13 @@ struct PermissionsPage: View {
                     }
 
                     // 🔹 Hidden Navigation Trigger → NameSetupView
-                    NavigationLink(
-                        destination: NameSetupView()
-                            .navigationBarBackButtonHidden(true),
-                        isActive: $navigateToNameSetup
-                    ) {
-                        EmptyView()
-                    }
+//                    NavigationLink(
+//                        destination: NameSetupView()
+//                            .navigationBarBackButtonHidden(true),
+//                        isActive: $navigateToNameSetup
+//                    ) {
+//                        EmptyView()
+//                    }
 
                     Spacer()
                 }
@@ -102,6 +104,10 @@ struct PermissionsPage: View {
     private func requestPermissions() {
         requestHealthAccess()
         requestMicrophoneAccess()
+    }
+    
+    private func finishPermissions() {
+        onboarding.step = .nameSetup
     }
 
     private func requestHealthAccess() {
@@ -146,6 +152,7 @@ struct PermissionsPage: View {
         if showingHealthPrompt && showingMicPrompt {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 navigateToNameSetup = true
+                finishPermissions()
             }
         }
     }

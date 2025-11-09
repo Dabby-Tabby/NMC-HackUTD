@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct LaunchView: View {
+    @EnvironmentObject var onboarding: OnboardingCoordinator
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -91,16 +93,18 @@ struct LaunchView: View {
                     }
                     
                     // 🔹 Get Started Button
-                    NavigationLink(destination: PermissionsPage()) {
-                        Text("Enter Control Center")
-                            .font(.headline.bold())
-                            .foregroundColor(Color("TextWhite"))
-                            .padding(.horizontal, 100)
-                            .padding(.vertical, 15)
-                            .background(Color("RoyalBlue"))
-                            .cornerRadius(26)
-                            .shadow(color: Color("RoyalBlue").opacity(0.4), radius: 8, x: 0, y: 4)
-                    }
+                    Button {
+                          onboarding.step = .permissions
+                      } label: {
+                          Text("Enter PulseLink")
+                              .font(.headline.bold())
+                              .foregroundColor(Color("TextWhite"))
+                              .padding(.horizontal, 100)
+                              .padding(.vertical, 15)
+                              .background(Color("RoyalBlue"))
+                              .cornerRadius(26)
+                              .shadow(color: Color("RoyalBlue").opacity(0.4), radius: 8, x: 0, y: 4)
+                      }
                     
                     Spacer()
                 }

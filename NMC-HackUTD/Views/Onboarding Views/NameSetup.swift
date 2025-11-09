@@ -9,6 +9,8 @@ import SwiftUI
 
 struct NameSetupView: View {
     @EnvironmentObject var session: PhoneSessionManager
+    @EnvironmentObject var onboarding: OnboardingCoordinator
+    
     @State private var name: String = ""
     @State private var navigateToDashboard = false
     @FocusState private var isFocused: Bool
@@ -96,7 +98,7 @@ struct NameSetupView: View {
                         guard !trimmedName.isEmpty else { return }
                         session.updateDisplayName(trimmedName)
                         session.startAdvertising()
-                        navigateToDashboard = true
+                        onboarding.step = .completed
                     }) {
                         HStack(spacing: 8) {
                             Image(systemName: "arrow.right.circle.fill")
@@ -114,13 +116,13 @@ struct NameSetupView: View {
                     }
 
                     // 🔹 Navigation to Dashboard
-                    NavigationLink(
-                        destination: DashboardView()
-                            .navigationBarBackButtonHidden(true),
-                        isActive: $navigateToDashboard
-                    ) {
-                        EmptyView()
-                    }
+//                    NavigationLink(
+//                        destination: DashboardView()
+//                            .navigationBarBackButtonHidden(true),
+//                        isActive: $navigateToDashboard
+//                    ) {
+//                        EmptyView()
+//                    }
 
                     Spacer()
                 }
