@@ -107,7 +107,7 @@ struct NmcAppShell: View {
                 WorkOrderListView()
                     .environmentObject(session)
             case .nomi:
-                NomiAssistantView()
+                NomiAssistantView(session: session)
                     .environmentObject(session)
             }
         }

@@ -9,12 +9,27 @@ import SwiftUI
 import Neumorphic
 
 struct NomiAssistantView: View {
-    @StateObject private var viewModel = NomiAssistantViewModel()
+    // MARK: - Environment & State
+    @EnvironmentObject var session: PhoneSessionManager
+    @StateObject private var workOrderViewModel = WorkOrderViewModel()
+    @StateObject private var viewModel: NomiAssistantViewModel
     @Namespace private var bottomID
     @State private var userInput = ""
 
     private let textOpacity: Double = 0.85
 
+    // MARK: - Custom Init (personalized greeting)
+    init(session: PhoneSessionManager) {
+        _workOrderViewModel = StateObject(wrappedValue: WorkOrderViewModel())
+        _viewModel = StateObject(
+            wrappedValue: NomiAssistantViewModel(
+                userName: session.myDisplayName,
+                workOrderViewModel: WorkOrderViewModel()
+            )
+        )
+    }
+
+    // MARK: - Body
     var body: some View {
         NavigationStack {
             ZStack {
@@ -33,10 +48,12 @@ extension NomiAssistantView {
     private var backgroundView: some View {
         ZStack {
             Color("BackgroundBlue").ignoresSafeArea()
-            CrossHatchBackground(lineColor: .white.opacity(0.02),
-                                 lineWidth: 0.3,
-                                 spacing: 30)
-                .ignoresSafeArea()
+            CrossHatchBackground(
+                lineColor: .white.opacity(0.02),
+                lineWidth: 0.3,
+                spacing: 30
+            )
+            .ignoresSafeArea()
         }
     }
 
@@ -140,7 +157,6 @@ extension NomiAssistantView {
             )
             .animation(.easeInOut(duration: 0.1), value: msg.text)
 
-
             if msg.sender == .nomi {
                 Button {
                     viewModel.speak(msg.text)
@@ -183,8 +199,8 @@ extension NomiAssistantView {
     }
 }
 
-
 #Preview {
-    NomiAssistantView()
+    NomiAssistantView(session: PhoneSessionManager())
+        .environmentObject(PhoneSessionManager())
         .preferredColorScheme(.dark)
 }
