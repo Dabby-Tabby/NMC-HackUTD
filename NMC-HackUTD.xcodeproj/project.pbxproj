@@ -75,6 +75,16 @@
 			);
 			target = 2E3394CF2EC07E9C00D7E95D /* iPad-NMC-HackUTD */;
 		};
+		2E33954E2EC0836E00D7E95D /* Exceptions for "NMC-HackUTD" folder in "Watch-NMC-HackUTD Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Views/Helper Views/CrossHatchView.swift",
+				"Views/Helper Views/FlameIcon.swift",
+				"Views/Helper Views/HeartBeatIcon.swift",
+				"Views/Helper Views/LungsBreathIcon.swift",
+			);
+			target = 2EF68BCF2EC00FE3005448FF /* Watch-NMC-HackUTD Watch App */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -87,6 +97,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				2E3393D32EC04C1C00D7E95D /* Exceptions for "NMC-HackUTD" folder in "NMC-HackUTD" target */,
+				2E33954E2EC0836E00D7E95D /* Exceptions for "NMC-HackUTD" folder in "Watch-NMC-HackUTD Watch App" target */,
 				2E3394DC2EC07F2B00D7E95D /* Exceptions for "NMC-HackUTD" folder in "iPad-NMC-HackUTD" target */,
 			);
 			path = "NMC-HackUTD";

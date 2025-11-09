@@ -13,19 +13,91 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            VStack(spacing: 8) {
-                Text("PulseLink")
-                    .font(.headline)
-                    .padding(.bottom, 4)
-                
-                // Live vitals
-                Text("❤️ HR: \(Int(health.heartRate)) bpm")
-                Text("🫁 O₂: \(Int(health.oxygen))%")
-                Text("🔥 Energy: \(Int(health.energy)) kcal")
-            }
-            .padding()
+            // 🔹 Crosshatch background (consistent visual)
+            CrossHatchBackground(
+                lineColor: .white.opacity(0.15),
+                lineWidth: 0.4,
+                spacing: 20
+            )
+            .ignoresSafeArea()
+            .background(Color("BoxBlue").ignoresSafeArea())
             
-            // ✅ Ping banner overlay (appears + fades automatically)
+            // 🔹 Swipeable pages
+            TabView {
+                // View 1: All vitals together
+                VStack(spacing: 12) {
+                    
+                    HeartBeatIcon(
+                        bpm: health.heartRate,
+                        color: .red,
+                        size: 30,
+                        glow: true
+                    )
+                    Text("\(Int(health.heartRate)) bpm")
+                        .font(.system(size: 16, weight: .medium))
+                    
+                    LungsBreathIcon(
+                        brpm: 12,
+                        color: Color("BabyBlue"),
+                        size: 30,
+                        glow: true,
+                        airflow: true
+                    )
+                    Text("\(Int(health.oxygen))% O₂")
+                        .font(.system(size: 16, weight: .medium))
+                    
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 30))
+                        .foregroundColor(Color("IncreaseGreen"))
+                    Text("\(Int(health.energy)) kcal")
+                        .font(.system(size: 16, weight: .medium))
+                }
+                .foregroundColor(.white)
+                .padding()
+                
+                // View 2: Heart Rate
+                VStack(spacing: 8) {
+                    HeartBeatIcon(
+                        bpm: health.heartRate,
+                        color: .red,
+                        size: 100,
+                        glow: true
+                    )
+                    Text("\(Int(health.heartRate)) bpm")
+                        .font(.title3)
+                        .bold()
+                }
+                .foregroundColor(.white)
+                
+                // View 3: Oxygen
+                VStack(spacing: 8) {
+                    LungsBreathIcon(
+                        brpm: 12,
+                        color: Color("BabyBlue"),
+                        size: 100,
+                        glow: true,
+                        airflow: true
+                    )
+                    Text("\(Int(health.oxygen))% O₂")
+                        .font(.title3)
+                        .bold()
+                }
+                .foregroundColor(.white)
+                
+                // View 4: Energy
+                VStack(spacing: 8) {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 100))
+                        .foregroundColor(Color("IncreaseGreen"))
+                    Text("\(Int(health.energy)) kcal")
+                        .font(.title3)
+                        .bold()
+                }
+                .foregroundColor(.white)
+            }
+            .tabViewStyle(.page(indexDisplayMode: .automatic))
+            
+            // ✅ Ping banner overlay
             if health.showPingBanner {
                 PingBanner()
             }
@@ -36,4 +108,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .preferredColorScheme(.dark)
 }
