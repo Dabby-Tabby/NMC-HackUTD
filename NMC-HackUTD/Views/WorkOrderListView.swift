@@ -35,53 +35,38 @@ struct WorkOrderListView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(.systemIndigo).opacity(0.5),
-                        Color(.black)
-                    ]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
+                Color("BackgroundBlue")
+                    .ignoresSafeArea()
                 
-                List {
-                    Section {
-                        ForEach(viewModel.activeWorkOrders) { workOrder in
-                            NavigationLink {
-                                WorkOrderDetailView(
-                                    workOrder: workOrder,
-                                    viewModel: viewModel
-                                )
-                            } label: {
-                                WorkOrderRowView(workOrder: workOrder)
-                            }
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-                        }
-                    } header: {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
                         Text("Active Work Orders")
                             .font(.headline)
                             .foregroundColor(.dashboardTextSecondary)
+                            .padding(.horizontal)
+                        
+                        VStack(spacing: 10) {
+                            ForEach(viewModel.activeWorkOrders) { workOrder in
+                                NavigationLink {
+                                    WorkOrderDetailView(
+                                        workOrder: workOrder,
+                                        viewModel: viewModel
+                                    )
+                                } label: {
+                                    WorkOrderRowView(workOrder: workOrder)
+                                }
+                                .buttonStyle(.plain) // keep card look, no row highlight
+                            }
+                        }
+                        .padding(.horizontal)
                     }
+                    .padding(.vertical, 8)
                 }
-                .scrollContentBackground(.hidden)
-                .listStyle(.plain)
-                .navigationTitle("Work Orders")
-                .toolbarBackground(.visible, for: .navigationBar)
-                .toolbarBackground(
-                    LinearGradient(
-                        colors: [.dashboardBackgroundTop.opacity(0.98),
-                                 .dashboardBackgroundTop.opacity(0.9)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    ),
-                    for: .navigationBar
-                )
-                .toolbarColorScheme(.dark, for: .navigationBar)
             }
+            .navigationTitle("Work Orders")
+            .toolbarColorScheme(.dark, for: .navigationBar)
         }
-        .tint(.dashboardAccentBlue) // nav + controls
+        .tint(.dashboardAccentBlue)
     }
 }
 
