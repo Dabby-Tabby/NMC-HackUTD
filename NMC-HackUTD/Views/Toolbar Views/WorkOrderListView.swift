@@ -367,6 +367,20 @@ struct WorkOrderDetailView: View {
         .safeAreaInset(edge: .bottom) {
             noteInputBar
         }
+        .overlay(alignment: .bottom) {
+            LinearGradient(
+                colors: [
+                    .clear,
+                    Color.black.opacity(0.9)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            .frame(height: 50)
+            .allowsHitTesting(false)
+        }
+        .scrollDismissesKeyboard(.interactively)
     }
     
     
@@ -404,16 +418,12 @@ struct WorkOrderDetailView: View {
                     
                     TextField("Add a note...", text: $newNoteText, axis: .vertical)
                         .textInputAutocapitalization(.sentences)
-                        .foregroundColor(.white)
+                        .foregroundColor(.white.opacity(2))
                         .lineLimit(1...3)
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
-                )
                 .glassEffect()
                 
                 Button {
