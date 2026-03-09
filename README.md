@@ -1,9 +1,15 @@
-# ⚡️ PulseLink – Intelligent Health & Operations Network
+# PulseLink
+### Intelligent Health & Operations Network
 
-> “Connecting people, devices, and data into one live ecosystem.”
+PulseLink is a multi-device Apple ecosystem application designed to integrate technician health monitoring with operational awareness in high-risk environments such as data centers.
+
+The system connects Apple devices including Apple Watch, iPhone, iPad, Mac, and Apple Vision Pro to provide real-time biometric monitoring alongside operational task management and AI-assisted troubleshooting.
+
+By combining health telemetry with infrastructure workflows, PulseLink creates a unified operational environment where both technician wellbeing and system status can be monitored simultaneously.
 
 ---
-## 🎥 Demo Previews
+
+## Demo
 
 <p align="center">
   <img src="Demos/EmployeeCard.gif" width="320" alt="Employee Card Demo" />
@@ -14,75 +20,87 @@
   <img src="Demos/LaunchScreen.PNG" width="200" alt="Launch Screen" />
   <img src="Demos/ExpandedWorkOrder.PNG" width="200" alt="Expanded Work Order" />
   <img src="Demos/NewWorkOrder.PNG" width="200" alt="New Work Order" />
-  <img src="Demos/AIText.PNG" width="200" alt="Gemini Integration" />
+  <img src="Demos/AIText.PNG" width="200" alt="AI Troubleshooting" />
 </p>
 
 ---
 
-### 💡 Inspiration
+## Overview
 
-In a high-stakes environment like **data centers**, where uptime equals millions of dollars and **human safety is critical**, there's often a disconnect between **human status** and **system status**.  
+In data center environments, system monitoring tools track infrastructure health, but rarely account for the physical condition of the technicians maintaining that infrastructure.
 
-We wanted to bridge that gap — uniting **people, devices, and data** into a single, live ecosystem.
+PulseLink bridges this gap by integrating live biometric data with operational workflows. Technicians can be monitored in real time while simultaneously managing maintenance tasks and responding to incidents.
 
----
-
-### 🚀 What PulseLink Does
-
-**PulseLink** connects technicians across the Apple ecosystem — iPhone, Apple Watch, iPad, Mac, and Vision Pro — continuously sharing live vitals (❤️ heart rate, 🫁 oxygen, 🔥 energy) from your **Apple Watch** or **AirPods Pro Gen 3** via Apple’s secure `MultipeerConnectivity` network.
-
-But PulseLink goes **far beyond health**:
-
-- 🧾 **Integrated Ticket Management System**  
-  Log incidents, track maintenance, and manage priority tasks — all without switching tools.
-
-- 🤖 **Built-in Gemini-Powered LLM**  
-  Answer complex hardware issues, suggest troubleshooting steps, or guide you through emergencies.
-
-- 🌐 **Unified Operational Awareness**  
-  From wrist to wall, every Apple device displays synchronized, real-time team and system data.
+The result is a shared operational interface that connects people, devices, and systems into a single real-time network.
 
 ---
 
-### 🧠 How We Built It
+## Features
 
-- **watchOS:** Streams real-time vitals using `HealthKit` + `WatchConnectivity`.  
-- **iOS:** Acts as the network hub — receiving and broadcasting vitals via `MultipeerConnectivity`.  
-  Also hosts the ticketing system for data-center technicians, built in **SwiftUI** and powered by **Gemini API** calls.  
-- **iPad & macOS:** Provide large-format dashboards showing all active technicians and metrics — synchronized with iOS.  
-- **visionOS:** Extends the dashboard into an immersive, spatial 3D control room for maximum operational awareness.  
+### Real-Time Health Monitoring
 
----
+PulseLink collects biometric data from Apple Watch and AirPods Pro (Gen 3), including heart rate, oxygen saturation, and energy metrics. Health data is transmitted securely between devices using Apple’s peer-to-peer networking frameworks.
 
-### ⚙️ Tech Stack
+### Integrated Work Order System
 
-| Category | Tools & Frameworks |
-|-----------|--------------------|
-| **Language** | Swift, SwiftUI, Combine |
-| **Connectivity** | MultipeerConnectivity, WatchConnectivity |
-| **Health Data** | HealthKit |
-| **AI** | Gemini LLM (via API integration) |
-| **Design** | Neumorphic UI + CrossHatch backgrounds |
-| **Platforms** | iOS · iPadOS · watchOS · macOS · visionOS |
+Technicians can create and manage maintenance tickets directly within the app. The work order interface allows teams to track incidents, assign priorities, and monitor active tasks without switching between tools.
+
+### AI-Assisted Troubleshooting
+
+The system integrates with the Gemini API to provide contextual troubleshooting assistance. Technicians can request explanations, diagnostic guidance, or recommended repair steps during incidents.
+
+### Cross-Device Operational Dashboard
+
+PulseLink synchronizes technician health data and operational metrics across devices. From a smartwatch interface to large dashboard displays, every device reflects the same real-time system state.
 
 ---
 
-### 💥 Challenges We Faced
+## Architecture
 
-- Building a **low-latency peer network** for real-time vitals sync — even with Apple’s frameworks, it’s tough under hackathon time pressure.  
-- Managing **privacy and security** while transmitting sensitive health data.  
-- Optimizing **UI layouts** for five Apple platforms with drastically different form factors.  
-- And, of course — doing all this within **24 hours**.
+PulseLink uses a distributed architecture built on Apple platform frameworks.
+
+### watchOS
+
+Apple Watch collects biometric data through HealthKit and transmits updates to the paired iPhone using WatchConnectivity.
+
+### iOS
+
+The iPhone acts as the primary networking hub. It receives health telemetry from the watch and distributes the data across nearby devices using MultipeerConnectivity. The iOS application also hosts the work order management interface and AI integration.
+
+### iPadOS and macOS
+
+Tablet and desktop devices provide large-format dashboards displaying technician status, health metrics, and active maintenance tasks.
+
+### visionOS
+
+PulseLink extends the dashboard into a spatial computing environment, allowing operators to monitor technicians and system status in a 3D workspace.
 
 ---
 
-### 🧭 What We Learned
+## Technologies
 
-- That we’re capable of building a full, multi-device ecosystem in under a day!  
-- How to architect a **real-time, peer-to-peer network** across Apple platforms.  
-- The **unseen challenges data-center technicians** experience every day.  
-- How AI and health data together can redefine operational safety and efficiency.
+| Category | Technologies |
+|--------|--------------|
+| Language | Swift |
+| UI Framework | SwiftUI |
+| Data Flow | Combine |
+| Health Data | HealthKit |
+| Connectivity | MultipeerConnectivity, WatchConnectivity |
+| AI Integration | Gemini API |
+| Platforms | iOS, iPadOS, watchOS, macOS, visionOS |
 
 ---
 
-© 2025 NMC-HackUTD
+## Development
+
+PulseLink was built during **HackUTD 2025** as a rapid prototype exploring how health telemetry and operational systems can be integrated across Apple devices.
+
+The project demonstrates how Apple’s platform frameworks enable real-time distributed systems with minimal infrastructure.
+
+---
+
+## License
+
+This project was developed for HackUTD and is intended as a prototype demonstration.
+
+© 2025 NMC HackUTD
